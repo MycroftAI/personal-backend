@@ -108,7 +108,7 @@ def send_mail(uuid=""):
         yag.send(user_email, data["title"], data["body"])
 
 
-@app.route("/"+API_VERSION+"/device/<uuid>/metric/<name>", methods=['PUT'])
+@app.route("/"+API_VERSION+"/device/<uuid>/metric/<name>", methods=['POST'])
 @noindex
 @donation
 @requires_auth
@@ -123,6 +123,27 @@ def metric(uuid="", name=""):
     user_data["metrics"][name].append(data)
     update_user_settings(uuid, data)
 
+
+@app.route("/"+API_VERSION+"/device/<uuid>/subscription", methods=['GET'])
+@noindex
+@donation
+@requires_auth
+def subscription_type(uuid=""):
+    user_data = retrieve_user_data(uuid=uuid)
+    subscription = user_data.get("subscription", {"@type": "free"})
+    return nice_json(subscription)
+
+
+@app.route("/"+API_VERSION+"/device/<uuid>/voice", methods=['GET'])
+@noindex
+@donation
+@requires_auth
+def get_subscriber_voice_url(uuid=""):
+    arch = request.args["arch"]
+    # TODO voice link
+    links = {}
+    url = links.get("arch")
+    return nice_json({"link": url})
 
 if __name__ == "__main__":
     global app
