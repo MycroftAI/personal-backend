@@ -58,6 +58,10 @@ quickly pair a device by
 # TODOS
 
 
+- skill settings
+
+- metrics
+
 - set up a database
 
 - everything else
