@@ -32,6 +32,8 @@ start your backend by running
 
 - get location
 
+- geoip location
+
 - get settings
 
 - whole pairing process
