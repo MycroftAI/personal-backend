@@ -30,11 +30,13 @@ start your backend by running python main.py
 
 - get location
 
-- geoip location
+- geoip location default
 
 - get config
 
 - get device settings
+
+- patch device settings
 
 - whole pairing process
 
