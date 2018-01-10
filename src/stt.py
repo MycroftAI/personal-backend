@@ -14,11 +14,9 @@ def stt():
     flac_audio = request.data
     lang = request.args["lang"]
 
-    # TODO use stream directly if possible
-    with open("stt_tmp.flac", "w") as f:
+    with open("stt.flac", "r+b") as f:
         f.write(flac_audio)
-
-    with AudioFile("stt_tmp.flac") as source:
+    with AudioFile("stt.flac") as source:
         audio = recognizer.record(source)  # read the entire audio file
 
     utterance = recognizer.recognize_google(audio, language=lang)
