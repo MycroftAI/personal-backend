@@ -32,7 +32,7 @@ with open("{}/database/admins.json".format(root_dir()), "r") as f:
 def update_user_settings(uuid, data):
     global user_settings
     if uuid not in user_settings:
-        user_settings[uuid] = {"uuid": uuid}
+        user_settings[uuid] = {}
     for k in data:
         user_settings[uuid][k] = data[k]
 
@@ -41,7 +41,7 @@ def get_user_settings(uuid):
     return user_settings.get(uuid, {})
 
 
-def retrieve_user_data(api="", refresh=False, uuid=False):
+def get_device_data(api="", refresh=False, uuid=False):
     global paired_users
     if uuid:
         data = paired_users.get(uuid)
@@ -59,10 +59,10 @@ def retrieve_user_data(api="", refresh=False, uuid=False):
     return None
 
 
-def update_paired_user(uuid, data):
+def update_device_data(uuid, data):
     global paired_users
     if uuid not in paired_users:
-        paired_users[uuid] = {"uuid": uuid}
+        paired_users[uuid] = {"name": "unknown_device", "uuid": uuid}
     for k in data:
         paired_users[uuid][k] = data[k]
 
@@ -101,7 +101,7 @@ def donation(f):
 
 def check_auth(api_key):
     """This function is called to check if a api key is valid."""
-    data = retrieve_user_data(api_key)
+    data = get_device_data(api_key)
     if not data:
         return False
     if data.get("expires_at") < time.time():

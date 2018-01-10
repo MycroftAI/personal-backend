@@ -9,7 +9,7 @@ from src import gen_api
 @donation
 @requires_auth
 def location(uuid):
-    result = get_user_settings(uuid).get("location")
+    result = get_user_settings(uuid)
     if not result:
         if not request.headers.getlist("X-Forwarded-For"):
             ip = request.remote_addr
@@ -18,6 +18,8 @@ def location(uuid):
             ip = request.headers.getlist("X-Forwarded-For")[0]
         result = geo_locate(ip)
         update_user_settings(uuid, {"location": result})
+    else:
+        result = result.get("location")
     return nice_json(result)
 
 
@@ -30,14 +32,6 @@ def setting(uuid=""):
     return nice_json(result)
 
 
-@app.route("/"+API_VERSION+"/device//setting", methods=['GET'])
-@noindex
-@donation
-@requires_auth
-def config_not_paired():
-    return redirect(url_for(API_VERSION+"/auth/token"), code=302)
-
-
 @app.route("/"+API_VERSION+"/device/<uuid>", methods=['PATCH', 'GET'])
 @noindex
 @donation
@@ -45,8 +39,8 @@ def config_not_paired():
 def uuid(uuid):
     if request.method == 'PATCH':
         result = request.json
-        update_user_settings(uuid, result)
-    result = get_user_settings(uuid)
+        update_device_data(uuid, result)
+    result = get_device_data(uuid=uuid)
     return nice_json(result)
 
 
@@ -68,7 +62,7 @@ def code():
 @requires_auth
 def device():
     api = request.headers.get('Authorization', '').replace("Bearer ", "")
-    result = retrieve_user_data(api) or {}
+    result = get_device_data(api) or {}
     return nice_json(result)
 
 
@@ -89,9 +83,11 @@ def activate():
     access_token = gen_api()
     new_refresh_token = gen_api()
 
-    result = {"expires_at": time.time() + 9999999999999, "accessToken": access_token,
-              "refreshToken": new_refresh_token, "uuid": uuid}
-    update_paired_user(uuid, result)
+    result = {"expires_at": time.time() + 72000, "accessToken": access_token,
+              "refreshToken": new_refresh_token, "uuid": uuid,
+              "name": get_device_data(uuid=uuid).get("name",
+                                                     "unknown_device")}
+    update_device_data(uuid, result)
     return nice_json(result)
 
 
@@ -103,7 +99,7 @@ def send_mail(uuid=""):
     data = request.json
     # sender is meant to id which skill triggered it and is currently ignored
     import yagmail
-    user_email = retrieve_user_data(uuid=uuid)
+    user_email = get_device_data(uuid=uuid)
     with yagmail.SMTP(MAIL, PASSWORD) as yag:
         yag.send(user_email, data["title"], data["body"])
 
@@ -115,13 +111,13 @@ def send_mail(uuid=""):
 def metric(uuid="", name=""):
     data = request.json
     print name, data
-    user_data = retrieve_user_data(uuid=uuid)
-    if "metrics" not in user_data:
-        user_data["metrics"] = {}
-    if name not in user_data["metrics"]:
-        user_data["metrics"][name] = []
-    user_data["metrics"][name].append(data)
-    update_user_settings(uuid, data)
+    device_data = get_device_data(uuid=uuid)
+    if "metrics" not in device_data:
+        device_data["metrics"] = {}
+    if name not in device_data["metrics"]:
+        device_data["metrics"][name] = []
+    device_data["metrics"][name].append(data)
+    update_device_data(uuid, data)
 
 
 @app.route("/"+API_VERSION+"/device/<uuid>/subscription", methods=['GET'])
@@ -129,8 +125,8 @@ def metric(uuid="", name=""):
 @donation
 @requires_auth
 def subscription_type(uuid=""):
-    user_data = retrieve_user_data(uuid=uuid)
-    subscription = user_data.get("subscription", {"@type": "free"})
+    device_data = get_device_data(uuid=uuid)
+    subscription = device_data.get("subscription", {"@type": "free"})
     return nice_json(subscription)
 
 
@@ -140,6 +136,7 @@ def subscription_type(uuid=""):
 @requires_auth
 def get_subscriber_voice_url(uuid=""):
     arch = request.args["arch"]
+    update_device_data(uuid=uuid, data={"arch": arch})
     # TODO voice link
     links = {}
     url = links.get("arch")

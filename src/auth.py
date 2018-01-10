@@ -18,8 +18,14 @@ def pair(code, uuid, name="unknown"):
         if real_code == code:
             entered_codes[uuid] = code
             unpaired_users.pop(uuid)
+            update_device_data(uuid, {"uuid": uuid, "name": name})
             result = {"paired": True}
-            update_user_settings(uuid, {"name": name})
+
+            # TODO account creation in pairing ?
+            account = {
+                'user': {"uuid": uuid, "email": ""}}
+            update_device_data(uuid, account)
+
     return nice_json(result)
 
 
@@ -28,7 +34,7 @@ def pair(code, uuid, name="unknown"):
 @donation
 def token():
     api = request.headers.get('Authorization', '').replace("Bearer ", "")
-    data = retrieve_user_data(api, refresh=True)
+    data = get_device_data(api, refresh=True)
     if not data:
         return Response(
             'Could not verify your access level for that URL.\n'
@@ -49,10 +55,11 @@ def token():
     access_token = gen_api()
     new_refresh_token = gen_api()
 
-    result = {"expires_at": time.time() + 9999999999999, "accessToken": access_token,
-              "refreshToken": new_refresh_token, "uuid": uuid}
+    result = {"expires_at": time.time() + 72000, "accessToken": access_token,
+              "refreshToken": new_refresh_token, "uuid": uuid,
+              "name": data.get("name", "unknown_device")}
 
-    update_paired_user(uuid, result)
+    update_device_data(uuid, result)
 
     return nice_json(result)
 
