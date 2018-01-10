@@ -60,6 +60,7 @@ quickly pair a device by
 
 # TODOS
 
+- STT
 
 - skill settings
 
