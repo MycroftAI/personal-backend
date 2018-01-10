@@ -10,7 +10,8 @@ from flask_sslify import SSLify
 API_VERSION = "v0.1"
 app = Flask(__name__)
 sslify = SSLify(app)
-
+MAIL = ""
+PASSWORD = ""
 
 # settings TODO sql
 user_settings = {}
@@ -40,8 +41,13 @@ def get_user_settings(uuid):
     return user_settings.get(uuid, {})
 
 
-def retrieve_user_data(api, refresh=False):
+def retrieve_user_data(api="", refresh=False, uuid=False):
     global paired_users
+    if uuid:
+        data = paired_users.get(uuid)
+        if data:
+            return data
+
     for uuid in paired_users:
         data = paired_users[uuid]
         token = data.get("accessToken", "")

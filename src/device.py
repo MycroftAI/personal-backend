@@ -95,6 +95,35 @@ def activate():
     return nice_json(result)
 
 
+@app.route("/"+API_VERSION+"/device/<uuid>/message", methods=['PUT'])
+@noindex
+@donation
+@requires_auth
+def send_mail(uuid=""):
+    data = request.json
+    # sender is meant to id which skill triggered it and is currently ignored
+    import yagmail
+    user_email = retrieve_user_data(uuid=uuid)
+    with yagmail.SMTP(MAIL, PASSWORD) as yag:
+        yag.send(user_email, data["title"], data["body"])
+
+
+@app.route("/"+API_VERSION+"/device/<uuid>/metric/<name>", methods=['PUT'])
+@noindex
+@donation
+@requires_auth
+def metric(uuid="", name=""):
+    data = request.json
+    print name, data
+    user_data = retrieve_user_data(uuid=uuid)
+    if "metrics" not in user_data:
+        user_data["metrics"] = {}
+    if name not in user_data["metrics"]:
+        user_data["metrics"][name] = []
+    user_data["metrics"][name].append(data)
+    update_user_settings(uuid, data)
+
+
 if __name__ == "__main__":
     global app
     port = 6712

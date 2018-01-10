@@ -40,6 +40,9 @@ start your backend by running
 
 - whole pairing process
 
+- store metrics
+
+- send mail
 
 
 # remote admin api
@@ -60,12 +63,12 @@ quickly pair a device by
 
 - skill settings
 
-- metrics
-
 - set up a database
 
 - wolfram alpha api
 
 - weather api
+
+- web ui
 
 - everything else
