@@ -38,7 +38,7 @@ start your backend by running python main.py
 
 - patch device settings
 
-- whole pairing process
+- pairing process
 
 - store metrics
 
