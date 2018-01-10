@@ -62,8 +62,10 @@ def code():
 @app.route("/"+API_VERSION+"/device", methods=['GET'])
 @noindex
 @donation
+@requires_auth
 def device():
-    result = get_user_settings(uuid)
+    api = request.headers.get('Authorization', '').replace("Bearer ", "")
+    result = retrieve_user_data(api) or {}
     return nice_json(result)
 
 
