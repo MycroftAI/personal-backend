@@ -64,7 +64,7 @@ quickly pair a device by
 
 - skill settings
 
-- set up a database
+- set up a sql database
 
 - wolfram alpha api
 
