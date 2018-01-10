@@ -34,7 +34,9 @@ start your backend by running
 
 - geoip location
 
-- get settings
+- get config
+
+- get device settings
 
 - whole pairing process
 
