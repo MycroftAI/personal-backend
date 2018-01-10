@@ -2,12 +2,17 @@ import pygeoip
 import os
 import json
 from flask import make_response
-import base64
+import requests
+import random
 
 
 def generate_code():
-    k = os.urandom(16)
-    k = base64.urlsafe_b64encode(k)[:6]
+    k = ""
+    while len(k) < 6:
+        k += random.choice(["A", "B", "C", "D", "E", "F", "G", "H", "I",
+                            "J", "K", "L", "M", "N", "O", "P", "Q", "R",
+                            "S", "T", "U", "Y", "V", "X", "W", "Z", "0",
+                            "1", "2", "3", "4", "5", "6", "7", "8", "9"])
     return k.upper()
 
 
@@ -23,8 +28,12 @@ def nice_json(arg):
 
 
 def geo_locate(ip):
-    g = pygeoip.GeoIP('GeoLiteCity.dat')
-    data = g.record_by_addr(ip) or {}
+    if ip in ["0.0.0.0", "127.0.0.1"]:
+        response = requests.get("https://ipapi.co/json/")
+        data = response.json()
+    else:
+        g = pygeoip.GeoIP('GeoLiteCity.dat')
+        data = g.record_by_addr(ip) or {}
 
     city = data.get("city")
     region_code = data.get("region_code")

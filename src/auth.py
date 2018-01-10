@@ -4,6 +4,25 @@ import time
 from src import gen_api
 
 
+@app.route("/" + API_VERSION + "/pair/<code>/<uuid>/<name>", methods=['PUT'])
+@noindex
+@donation
+@requires_admin
+def pair(code, uuid, name="unknown"):
+    global unpaired_users
+    # pair
+    result = {"paired": False}
+    if uuid in unpaired_users:
+        # auto - pair ?
+        real_code = unpaired_users[uuid]
+        if real_code == code:
+            entered_codes[uuid] = code
+            unpaired_users.pop(uuid)
+            result = {"paired": True}
+            update_user_settings(uuid, {"name": name})
+    return nice_json(result)
+
+
 @app.route("/"+API_VERSION+"/auth/token", methods=['GET'])
 @noindex
 @donation

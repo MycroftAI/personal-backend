@@ -38,13 +38,15 @@ def config_not_paired():
     return redirect(url_for(API_VERSION+"/auth/token"), code=302)
 
 
-@app.route("/"+API_VERSION+"/device/<uuid>", methods=['PATCH'])
+@app.route("/"+API_VERSION+"/device/<uuid>", methods=['PATCH', 'GET'])
 @noindex
 @donation
 @requires_auth
 def uuid(uuid):
+    if request.method == 'PATCH':
+        result = request.json
+        update_user_settings(uuid, result)
     result = get_user_settings(uuid)
-    print request.json()
     return nice_json(result)
 
 
@@ -54,6 +56,7 @@ def uuid(uuid):
 def code():
     uuid = request.args["state"]
     code = generate_code()
+    print code
     unpaired_users[uuid] = code
     result = {"code": code, "uuid": uuid}
     return nice_json(result)
@@ -69,30 +72,11 @@ def device():
     return nice_json(result)
 
 
-@app.route("/" + API_VERSION + "/pair/<code>/<uuid>", methods=['PUT'])
-@noindex
-@donation
-@requires_admin
-def pair(code, uuid):
-    global unpaired_users
-    # pair
-    result = {"paired": False}
-    if uuid in unpaired_users:
-        # auto - pair ?
-        real_code = unpaired_users[uuid]
-        if real_code == code:
-            entered_codes[uuid] = code
-            unpaired_users.pop(uuid)
-            result = {"paired": True}
-    return nice_json(result)
-
-
 @app.route("/"+API_VERSION+"/device/activate", methods=['POST'])
 @noindex
 @donation
 def activate():
     uuid = request.json["state"]
-    print "activate", request.json
 
     # paired?
     if uuid not in entered_codes:

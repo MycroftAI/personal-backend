@@ -52,7 +52,7 @@ quickly pair a device by
 
     ap = BackendMycroftAPI("admin_key")
 
-    print ap.pair("BBDYIZU9", "090422ad-ba2a-49ea-98ba-e39b41471368")
+    print ap.pair("KHSCLA", "489e9dcb-d657-49c0-99c2-1e0f7a8f602e")
 
 
 # TODOS
@@ -63,5 +63,9 @@ quickly pair a device by
 - metrics
 
 - set up a database
+
+- wolfram alpha api
+
+- weather api
 
 - everything else
