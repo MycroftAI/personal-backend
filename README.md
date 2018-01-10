@@ -22,9 +22,7 @@ change url in "server" section in your default mycroft config
       },
 
 
-start your backend by running
-
-    python main.py
+start your backend by running python main.py
 
 
 # Features
