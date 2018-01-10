@@ -44,6 +44,8 @@ start your backend by running python main.py
 
 - send mail
 
+- STT using google default key
+
 
 # remote admin api
 
@@ -59,8 +61,6 @@ quickly pair a device by
 
 
 # TODOS
-
-- STT
 
 - skill settings
 
