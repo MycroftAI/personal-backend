@@ -56,4 +56,3 @@ def geo_locate(ip):
     location_data = {"city": city_data, "coordinate": coordinate_data,
                      "timezone": timezone_data}
     return location_data
-

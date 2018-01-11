@@ -35,6 +35,6 @@ class BackendMycroftAPI(object):
 if __name__ == "__main__":
     ap = BackendMycroftAPI("admin_key")
     name = "jarbas"
-    print ap.pair("U1HL0A", "e3f29252-4235-40cc-9485-6f01f1c4d189", name)
+    print ap.pair("TES3NY", "ae4928a3-cd0b-49d7-8109-cbb0998d082a", name)
 
 
