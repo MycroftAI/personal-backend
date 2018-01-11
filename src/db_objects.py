@@ -1,4 +1,6 @@
-from sqlalchemy import *
+from sqlalchemy import Column, String, Integer, Boolean, create_engine, \
+    MetaData, Table, Float, ForeignKey
+from sqlalchemy.orm import sessionmaker, relation, mapper
 
 
 class User(object):
@@ -173,7 +175,7 @@ class Database(object):
     def __init__(self, path='sqlite:///mycroft.db', debug=True):
         self.db = create_engine(path)
         self.db.echo = debug
-        self.metadata = BoundMetaData(self.db)
+        self.metadata = MetaData(self.db)
 
         self.tts = Table('tts', self.metadata,
                     Column('tts_id', Integer, primary_key=True),
@@ -369,11 +371,10 @@ class Database(object):
         mapper(TTS, self.tts)
         mapper(Hotword, self.hotwords)
         mapper(Skill, self.installed_skills)
-        mapper(Skill, self.priority_skills)
-        mapper(Skill, self.blacklisted_skills)
+        mapper(Skill, self.priority_skills, non_primary=True)
+        mapper(Skill, self.blacklisted_skills, non_primary=True)
         mapper(Sounds, self.sounds)
         mapper(Location, self.locations)
-        mapper(Configuration, self.configs)
         mapper(Device, self.devices, properties={
             'config': relation(Configuration, secondary=config_association,
                               backref='devices'),
@@ -406,8 +407,8 @@ class Database(object):
             'location': relation(Location, secondary=location_association,
                             backref='config'),
         })
-
-        self.session = create_session()
+        Session = sessionmaker(bind=self.db)
+        self.session = Session()
 
     def get_user_by_name(self, name):
         return self.session.query(User).get_by(name=name)
@@ -486,3 +487,5 @@ class Database(object):
 
     def get_config_by_device_name(self, name):
         return self.session.query(Configuration).get_by(device_name=name)
+
+db = Database()
