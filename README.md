@@ -4,6 +4,10 @@ Personal mycroft backend alternative to mycroft.home, written in flask
 
 # UNDER CONSTRUCTION
 
+# Status
+
+cyclic import bug, unusable
+
 # usage
 
 
