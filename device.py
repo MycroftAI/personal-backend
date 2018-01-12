@@ -3,7 +3,7 @@ from base import app, noindex, donation, nice_json, \
     PASSWORD
 from flask import redirect, url_for, request, Response
 from backend_utils import geo_locate, generate_code, location_dict
-from . import gen_api
+from database import gen_api
 import yagmail
 import time
 

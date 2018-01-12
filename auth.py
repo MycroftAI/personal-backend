@@ -2,7 +2,7 @@ from base import app, noindex, donation, requires_admin, nice_json, \
     API_VERSION, UNPAIRED_USERS, DEVICES, start
 from flask import request, Response
 import time
-from . import gen_api
+from database import gen_api
 
 
 @app.route("/" + API_VERSION + "/pair/<code>/<uuid>/<name>", methods=['PUT'])
