@@ -56,3 +56,23 @@ def geo_locate(ip):
     location_data = {"city": city_data, "coordinate": coordinate_data,
                      "timezone": timezone_data}
     return location_data
+
+
+def location_dict(city="", region_code="", country_code="",
+             country_name="", region="", longitude=0, latitude=0,
+             timezone=""):
+    region_data = {"code": region_code, "name": region,
+                        "country": {
+                            "code": country_code,
+                            "name": country_name}}
+    city_data = {"code": city, "name": city,
+                      "state": region_data,
+                      "region": region_data}
+    timezone_data = {"code": timezone, "name": timezone,
+                          "dstOffset": 3600000,
+                          "offset": -21600000}
+    coordinate_data = {"latitude": float(latitude),
+                            "longitude": float(longitude)}
+    return {"city": city_data,
+                          "coordinate": coordinate_data,
+                          "timezone": timezone_data}

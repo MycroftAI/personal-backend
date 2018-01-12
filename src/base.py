@@ -1,11 +1,11 @@
-import json
 import ssl
 import time
 from functools import wraps
 from src.util import root_dir, nice_json
 from flask import Flask, make_response, request, Response
 from flask_sslify import SSLify
-
+from src.database.admin import AdminDatabase
+from src.database.devices import DeviceDatabase
 
 API_VERSION = "v0.1"
 app = Flask(__name__)
@@ -13,58 +13,14 @@ sslify = SSLify(app)
 MAIL = ""
 PASSWORD = ""
 
-# settings TODO sql
-user_settings = {}
-
-# device data TODO sql
-paired_users = {}
 
 # users in middle of pairing
-unpaired_users = {}
-entered_codes = {}
+UNPAIRED_USERS = {}
+ENTERED_CODES = {}
 
 
-# TODO sql
-with open("{}/database/admins.json".format(root_dir()), "r") as f:
-    admins = json.load(f)
-
-
-def update_user_settings(uuid, data):
-    global user_settings
-    if uuid not in user_settings:
-        user_settings[uuid] = {}
-    for k in data:
-        user_settings[uuid][k] = data[k]
-
-
-def get_user_settings(uuid):
-    return user_settings.get(uuid, {})
-
-
-def get_device_data(api="", refresh=False, uuid=False):
-    global paired_users
-    if uuid:
-        data = paired_users.get(uuid)
-        if data:
-            return data
-
-    for uuid in paired_users:
-        data = paired_users[uuid]
-        token = data.get("accessToken", "")
-        refresh_token = data.get("refreshToken", "")
-        if refresh and refresh_token == api:
-            return data
-        if token == api:
-            return data
-    return None
-
-
-def update_device_data(uuid, data):
-    global paired_users
-    if uuid not in paired_users:
-        paired_users[uuid] = {"name": "unknown_device", "uuid": uuid}
-    for k in data:
-        paired_users[uuid][k] = data[k]
+ADMINS = AdminDatabase(debug=True)
+DEVICES = DeviceDatabase(debug=True)
 
 
 def add_response_headers(headers=None):
@@ -101,17 +57,19 @@ def donation(f):
 
 def check_auth(api_key):
     """This function is called to check if a api key is valid."""
-    data = get_device_data(api_key)
-    if not data:
+    device = DEVICES.get_device_by_token(api_key)
+    if not len(device):
         return False
-    if data.get("expires_at") < time.time():
+    device = device[0]
+    if device.expires_at < time.time():
         return False
     return True
 
 
 def check_admin_auth(api_key):
     """This function is called to check if a api key is valid."""
-    if api_key not in admins:
+    user = ADMINS.get_user_by_api_key(api_key)
+    if not len(user):
         return False
     return True
 
@@ -141,7 +99,6 @@ def requires_admin(f):
     def decorated(*args, **kwargs):
         auth = request.headers.get('Authorization', '')
         if not auth or not check_admin_auth(auth):
-            print "not admin"
             return authenticate()
         return f(*args, **kwargs)
 
@@ -169,6 +126,5 @@ def start(app, port=6666):
 
 
 if __name__ == "__main__":
-    global app
     port = 5678
     start(app, port)
