@@ -50,6 +50,7 @@ start your backend by running python main.py
 
 - STT using google default key
 
+- sql database
 
 # remote admin api
 
@@ -67,8 +68,6 @@ quickly pair a device by
 # TODOS
 
 - skill settings
-
-- set up a sql database
 
 - wolfram alpha api
 
