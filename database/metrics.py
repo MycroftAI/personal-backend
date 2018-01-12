@@ -2,8 +2,8 @@ from sqlalchemy import Column, String, Integer, create_engine, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.exc import IntegrityError
 
-from src.database.devices import Device, User
-from src.database import Base
+from database.devices import Device, User
+from database import Base
 
 import time
 

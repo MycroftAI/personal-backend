@@ -1,4 +1,4 @@
-from src.base import *
+from base import app, noindex, donation, requires_auth, start, API_VERSION
 from flask import redirect, url_for, request, Response
 
 from speech_recognition import Recognizer, AudioFile

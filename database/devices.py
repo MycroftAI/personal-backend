@@ -2,10 +2,10 @@ from sqlalchemy import Column, Text, String, Integer, create_engine, ForeignKey,
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.exc import IntegrityError
 
-from src.database import Base
-from src.database.user import User
-from src.database.metrics import Metric
-from src.database.configuration import Configuration, Hotword, STT, TTS
+from database import Base
+from database.user import User
+from database.metrics import Metric
+from database.configuration import Configuration, Hotword, STT, TTS
 
 import time
 

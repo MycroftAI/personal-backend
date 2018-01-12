@@ -1,8 +1,8 @@
 from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, Float
 from sqlalchemy.orm import relationship
 
-from src.database.devices import Device, User, Skill
-from src.database import Base
+from database.devices import Device, User, Skill
+from database import Base
 
 
 class Configuration(Base):

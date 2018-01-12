@@ -1,9 +1,9 @@
-from src.base import app, noindex, donation, nice_json, \
+from base import app, noindex, donation, nice_json, \
     API_VERSION, UNPAIRED_USERS, DEVICES, start, requires_auth, MAIL, \
     PASSWORD, METRICS
 from flask import redirect, url_for, request, Response
-from src.util import geo_locate, generate_code, location_dict
-from src import gen_api
+from util import geo_locate, generate_code, location_dict
+from . import gen_api
 import yagmail
 import time
 

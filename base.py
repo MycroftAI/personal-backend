@@ -1,11 +1,11 @@
 import ssl
 import time
 from functools import wraps
-from src.util import root_dir, nice_json
+from util import root_dir, nice_json
 from flask import Flask, make_response, request, Response
 from flask_sslify import SSLify
-from src.database.admin import AdminDatabase
-from src.database.devices import DeviceDatabase
+from database.admin import AdminDatabase
+from database.devices import DeviceDatabase
 
 API_VERSION = "v0.1"
 app = Flask(__name__)

@@ -2,10 +2,10 @@ from sqlalchemy import Column, Text, String, Integer, create_engine
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.exc import IntegrityError
 
-from src.database import Base
-from src.database.devices import Device, IPAddress, Location
-from src.database.metrics import Metric
-from src.database.configuration import Configuration, Hotword
+from database import Base
+from database.devices import Device, IPAddress, Location
+from database.metrics import Metric
+from database.configuration import Configuration, Hotword
 
 import time
 
