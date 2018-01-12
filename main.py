@@ -1,4 +1,4 @@
-from base import  app, start
+from base import app, start
 from device import location, setting, get_uuid, code, device, activate,\
     send_mail, metric, subscription_type, get_subscriber_voice_url
 from auth import pair, token

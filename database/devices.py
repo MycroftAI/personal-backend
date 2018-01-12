@@ -57,7 +57,7 @@ class IPAddress(Base):
 
 class Location(Base):
     __tablename__ = "locations"
-    created_at = Column(Integer, 'created_at', default=time.time(Configuration))
+    created_at = Column(Integer, 'created_at', default=time.time())
     id = Column(Integer, primary_key=True)
     last_seen = Column(Integer, default=0)
     city = Column(String)
