@@ -1,13 +1,45 @@
-from sqlalchemy import Column, Text, String, Integer, create_engine
+from sqlalchemy import Column, Text, String, Integer, create_engine, Table, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.exc import IntegrityError
 
 from database import Base
-from database.devices import Device, IPAddress, Location
-from database.metrics import Metric
-from database.configuration import Configuration, Hotword
 
 import time
+
+users_devices = Table('users_devices', Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.id')),
+    Column('uuid', Integer, ForeignKey('devices.uuid'))
+)
+
+
+users_ips = Table('users_ips', Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.id')),
+    Column('ip_adress', Integer, ForeignKey('ips.ip_address'))
+)
+
+
+users_location = Table('users_locations', Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.id')),
+    Column('location_id', Integer, ForeignKey('locations.id'))
+)
+
+
+users_metrics = Table('users_metrics', Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.id')),
+    Column('metric_id', Integer, ForeignKey('metric.id'))
+)
+
+
+users_configs = Table('users_configs', Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.id')),
+    Column('config_id', Integer, ForeignKey('configs.uuid'))
+)
+
+
+users_hotwords = Table('users_hotwords', Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.id')),
+    Column('hotword_name', Integer, ForeignKey('hotwords.name'))
+)
 
 
 class User(Base):
@@ -19,16 +51,23 @@ class User(Base):
     name = Column(String, default="unknown_user")
     mail = Column(String)
     last_seen = Column(Integer, default=0)
+    ips = Column(String, ForeignKey("IPAddress.ip_address"))
 
-    devices = relationship(Device, order_by=Device.uuid,
-                           back_populates="user")
-    ips = relationship(IPAddress, order_by=IPAddress.last_seen,
-                       back_populates="users")
-    location = relationship(Location, order_by=Location.id,
-                            back_populates="users")
-    metrics = relationship(Metric, back_populates="users")
-    configs = relationship(Configuration, back_populates="users")
-    hotwords = relationship(Hotword, back_populates="users")
+    devices = relationship("Device", order_by="Device.last_seen",
+                           back_populates="user",
+                           secondary=users_devices)
+    ips = relationship("IPAddress", order_by="IPAddress.last_seen",
+                       back_populates="users",
+                           secondary=users_ips)
+    location = relationship("Location", order_by="Location.id",
+                            back_populates="users",
+                           secondary=users_location)
+    metrics = relationship("Metric", back_populates="users",
+                           secondary=users_metrics)
+    configs = relationship("Configuration", back_populates="users",
+                           secondary=users_configs)
+    hotwords = relationship("Hotword", back_populates="users",
+                           secondary=users_hotwords)
 
     def __repr__(self):
         return self.mail

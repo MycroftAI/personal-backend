@@ -1,34 +1,112 @@
-from sqlalchemy import Column, Text, String, Integer, create_engine, ForeignKey, Boolean
+from sqlalchemy import Column, Text, String, Integer, create_engine, \
+    ForeignKey, Boolean, Table
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.exc import IntegrityError
 
 from database import Base
-from database.user import User
-from database.metrics import Metric
-from database.configuration import Configuration, Hotword, STT, TTS
 
 import time
 
 
+device_user = Table('device_user', Base.metadata,
+    Column('uuid', Integer, ForeignKey('devices.uuid')),
+    Column('user_id', Integer, ForeignKey('users.id'))
+)
+
+
+device_ips = Table('device_ips', Base.metadata,
+    Column('uuid', Integer, ForeignKey('devices.uuid')),
+    Column('ip_addresses', Integer, ForeignKey('ips.ip_address'))
+)
+
+
+device_location = Table('device_location', Base.metadata,
+    Column('uuid', Integer, ForeignKey('devices.uuid')),
+    Column('location_id', Integer, ForeignKey('locations.id'))
+)
+
+
+device_metrics = Table('device_metrics', Base.metadata,
+    Column('uuid', Integer, ForeignKey('devices.uuid')),
+    Column('metrics_id', Integer, ForeignKey('metric.id'))
+)
+
+
+device_config = Table('device_config', Base.metadata,
+    Column('uuid', Integer, ForeignKey('devices.uuid')),
+    Column('config_id', Integer, ForeignKey('configs.uuid'))
+)
+
+device_skills = Table('device_skills', Base.metadata,
+    Column('uuid', Integer, ForeignKey('devices.uuid')),
+    Column('skill_names', Integer, ForeignKey('skills.name'))
+)
+
+
+device_hotwords = Table('device_hotwords', Base.metadata,
+    Column('uuid', Integer, ForeignKey('devices.uuid')),
+    Column('hotword_names', Integer, ForeignKey('hotwords.name'))
+)
+
+ip_users = Table('ip_users', Base.metadata,
+    Column('ip_address', Integer, ForeignKey('ips.ip_address')),
+    Column('user_ids', Integer, ForeignKey('users.id'))
+)
+
+ip_devices = Table('ip_devices', Base.metadata,
+    Column('ip_address', Integer, ForeignKey('ips.ip_address')),
+    Column('devices', Integer, ForeignKey('devices.uuid'))
+)
+
+
+location_users = Table('location_users', Base.metadata,
+    Column('location', Integer, ForeignKey('locations.id')),
+    Column('user_ids', Integer, ForeignKey('users.id'))
+)
+
+location_devices = Table('location_devices', Base.metadata,
+    Column('location', Integer, ForeignKey('locations.id')),
+    Column('uuids', Integer, ForeignKey('devices.uuid'))
+)
+
+skill_devices = Table('skill_devices', Base.metadata,
+    Column('skill_name', Integer, ForeignKey('skills.name')),
+    Column('uuids', Integer, ForeignKey('devices.uuid'))
+)
+
+
 class Device(Base):
     __tablename__ = "devices"
-    created_at = Column(Integer, 'created_at', default=time.time())
+    created_at = Column(Integer, default=time.time())
     uuid = Column(Text, primary_key=True)
     description = Column(Text)
     name = Column(String, default="unknown_device")
     last_seen = Column(Integer, default=0)
 
-    user_id = Column(Integer, ForeignKey(User.id))
-    user = relationship(User, order_by=User.id,
-                        back_populates="devices")
-    ips = relationship(IPAddress, order_by=IPAddress.last_seen,
-                       back_populates="devices")
-    location = relationship(Location, order_by=Location.id,
-                            back_populates="devices")
-    skills = relationship(Skill, back_populates="devices")
-    metrics = relationship(Metric, back_populates="users")
-    config = relationship(Configuration, back_populates="device")
-    hotwords = relationship(Hotword, back_populates="devices")
+    user_id = Column(Integer, ForeignKey("User.id"))
+    ip_addresses = Column(String, ForeignKey("IPAddress.ip_address"))
+    location_id = Column(String, ForeignKey("Location.uuid"))
+    metrics_id = Column(String, ForeignKey("Metrics.uuid"))
+    skill_names = Column(String, ForeignKey("Skill.name"))
+    hotword_names = Column(String, ForeignKey("Hotword.name"))
+
+    user = relationship("User", order_by="User.id",
+                        back_populates="devices",
+                           secondary=device_user)
+    ips = relationship("IPAddress", order_by="IPAddress.last_seen",
+                       back_populates="devices",
+                           secondary=device_ips)
+    location = relationship("Location", order_by="Location.id",
+                            back_populates="devices",
+                           secondary=device_location)
+    skills = relationship("Skill", back_populates="devices",
+                           secondary=device_skills)
+    metrics = relationship("Metric", back_populates="users",
+                           secondary=device_metrics)
+    config = relationship("Configuration", back_populates="device",
+                           secondary=device_config)
+    hotwords = relationship("Hotword", back_populates="devices",
+                           secondary=device_hotwords)
 
     expires_at = Column(Integer, default=0)
     accessToken = Column(String)
@@ -43,13 +121,16 @@ class Device(Base):
 
 class IPAddress(Base):
     __tablename__ = "ips"
-    created_at = Column(Integer, 'created_at', default=time.time())
+    created_at = Column(Integer, default=time.time())
     ip_address = Column(String, primary_key=True)
     last_seen = Column(Integer, default=0)
-    users = relationship(User, order_by=User.id,
-                         back_populates="ips")
-    devices = relationship(Device, order_by=Device.last_seen,
-                           back_populates="ips")
+    uuids = Column(Integer, ForeignKey("Device.uuid"))
+    users = relationship("User", order_by="User.last_seen",
+                         back_populates="ips",
+                           secondary=ip_users)
+    devices = relationship("Device", order_by="Device.last_seen",
+                           back_populates="ips",
+                           secondary=ip_devices)
 
     def __repr__(self):
         return self.ip_address
@@ -57,7 +138,7 @@ class IPAddress(Base):
 
 class Location(Base):
     __tablename__ = "locations"
-    created_at = Column(Integer, 'created_at', default=time.time())
+    created_at = Column(Integer, default=time.time())
     id = Column(Integer, primary_key=True)
     last_seen = Column(Integer, default=0)
     city = Column(String)
@@ -68,10 +149,12 @@ class Location(Base):
     longitude = Column(Integer, default=0)
     latitude = Column(Integer, default=0)
     timezone = Column(String)
-    users = relationship(User, order_by=User.id,
-                         back_populates="locations")
-    devices = relationship(Device, order_by=Device.last_seen,
-                           back_populates="location")
+    users = relationship("User", order_by="User.id",
+                         back_populates="locations",
+                           secondary=location_users)
+    devices = relationship("Device", order_by="Device.last_seen",
+                           back_populates="location",
+                           secondary=location_devices)
 
     def __repr__(self):
         return self.country_name
@@ -79,13 +162,14 @@ class Location(Base):
 
 class Skill(Base):
     __tablename__ = "skills"
-    created_at = Column(Integer, 'created_at', default=time.time())
+    created_at = Column(Integer, default=time.time())
     path = Column(String)
     name = Column(String)
     folder = Column(String, primary_key=True)
     github = Column(String)
-    devices = relationship(Device, order_by=Device.last_seen,
-                           back_populates="skills")
+    devices = relationship("Device", order_by="Device.last_seen",
+                           back_populates="skills",
+                           secondary=skill_devices)
     priority = Column(Boolean, default=False)
     blacklisted = Column(Boolean, default=False)
 
@@ -102,47 +186,46 @@ class DeviceDatabase(object):
         Base.metadata.create_all(self.db)
 
     def get_user_by_name(self, name):
-        return self.session.query(User).filter_by(User.name == name).all()
+        return self.session.query("User").filter_by("User.name" == name).all()
 
     def get_user_by_mail(self, mail):
-        return self.session.query(User).filter_by(User.mail == mail).all()
+        return self.session.query("User").filter_by("User.mail" == mail).all()
 
     def get_user_by_api_key(self, api_key):
-        return self.session.query(User).filter_by(User.api_key
+        return self.session.query("User").filter_by("User.api_key"
                                                   == api_key).all()
 
     def get_user_by_device(self, uuid):
-        return self.session.query(User).filter_by(Device.uuid == uuid).all()
+        return self.session.query("User").filter_by(Device.uuid == uuid).all()
 
     def get_user_by_device_name(self, name):
-        return self.session.query(User).filter_by(
+        return self.session.query("User").filter_by(
             Device.device_name == name).all()
 
     def get_user_by_ip(self, ip):
-        return self.session.query(User).filter_by(IPAddress.ip_address ==
+        return self.session.query("User").filter_by(IPAddress.ip_address ==
                                                   ip).all()
 
     def get_user_by_wakeword(self, wakeword):
-        return self.session.query(User).filter_by(
-            Configuration.wake_word == wakeword
-        ).all()
+        return self.session.query("User").filter_by(
+            "Configuration.wake_word" == wakeword).all()
 
     def get_user_by_hotword(self, hotword):
-        return self.session.query(User).filter_by(Hotword.name == hotword)
+        return self.session.query("User").filter_by("Hotword.name" == hotword)
 
     def get_user_by_lang(self, lang):
-        return self.session.query(User).filter_by(
-            Configuration.lang == lang).all()
+        return self.session.query("User").filter_by(
+            "Configuration.lang" == lang).all()
 
     def get_user_by_country(self, country):
-        return self.session.query(User).filter_by(
+        return self.session.query("User").filter_by(
             Location.country_name == country).all()
 
     def get_user_by_city(self, city):
-        return self.session.query(User).filter_by(Location.city == city).all()
+        return self.session.query("User").filter_by(Location.city == city).all()
 
     def get_user_by_timezone(self, timezone):
-        return self.session.query(User).filter_by(
+        return self.session.query("User").filter_by(
             Location.timezone == timezone).all()
 
     def get_device_by_uuid(self, uuid):
@@ -152,7 +235,7 @@ class DeviceDatabase(object):
         return self.session.query(Device).filter_by(Device.name == name).all()
 
     def get_device_by_user(self, name):
-        return self.session.query(Device).filter_by(User.name == name).all()
+        return self.session.query(Device).filter_by("User.name" == name).all()
 
     def get_device_by_ip(self, ip):
         return self.session.query(Device).filter_by(
@@ -160,15 +243,15 @@ class DeviceDatabase(object):
 
     def get_device_by_wakeword(self, wakeword):
         return self.session.query(Device).filter_by(
-            Configuration.wake_word == wakeword).all()
+            "Configuration.wake_word" == wakeword).all()
 
     def get_device_by_hotword(self, hotword):
         return self.session.query(Device).filter_by(
-            Hotword.name == hotword).all()
+            "Hotword.name" == hotword).all()
 
     def get_device_by_lang(self, lang):
         return self.session.query(Device).filter_by(
-            Configuration.lang == lang).all()
+            "Configuration.lang" == lang).all()
 
     def get_device_by_country(self, country):
         return self.session.query(Device).filter_by(
@@ -187,11 +270,11 @@ class DeviceDatabase(object):
             Location.timezone == timezone).all()
 
     def get_config_by_user(self, name):
-        return self.session.query(Configuration).filter_by(
-            User.name == name).all()
+        return self.session.query("Configuration").filter_by(
+           "User.name" == name).all()
 
     def get_config_by_device(self, uuid):
-        return self.session.query(Configuration).filter_by(
+        return self.session.query("Configuration").filter_by(
             Device.uuid == uuid).one()
 
     def get_location_by_device(self, uuid):
@@ -199,7 +282,7 @@ class DeviceDatabase(object):
             Device.uuid == uuid).one()
 
     def get_config_by_device_name(self, name):
-        return self.session.query(Configuration).filter_by(
+        return self.session.query("Configuration").filter_by(
             Device.name == name).all()
 
     def add_user(self, mail=None, name="", password="", api=""):
@@ -311,19 +394,19 @@ class DeviceDatabase(object):
             .filter_by(Device.paired == True).all()
 
     def total_users(self):
-        return self.session.query(User).count()
+        return self.session.query("User").count()
 
     def total_devices(self):
         return self.session.query(Device).count()
 
     def total_configs(self):
-        return self.session.query(Configuration).count()
+        return self.session.query("Configuration").count()
 
     def total_locations(self):
         return self.session.query(Location).count()
 
     def total_hotwords(self):
-        return self.session.query(Hotword).count()
+        return self.session.query("Hotword").count()
 
     def total_skills(self):
         return self.session.query(Skill).filter_by(Skill.name).count()
@@ -332,20 +415,20 @@ class DeviceDatabase(object):
         return self.session.query(IPAddress).count()
 
     def total_langs(self):
-        return self.session.query(Configuration).filter_by(Configuration.lang).count()
+        return self.session.query("Configuration").filter_by("Configuration.lang").count()
 
     def total_countries(self):
-        return self.session.query(Configuration).filter_by(
+        return self.session.query("Configuration").filter_by(
             Location.country_code).count()
 
     def total_stt(self):
-        return self.session.query(STT).filter_by(STT.name).count()
+        return self.session.query("STT").filter_by("STT.name").count()
 
     def total_tts(self):
-        return self.session.query(TTS).filter_by(TTS.name).count()
+        return self.session.query("TTS").filter_by("TTS.name").count()
 
     def total_metrics(self):
-        return self.session.query(Metric).count()
+        return self.session.query("Metric").count()
 
     def commit(self):
         self.session.commit()

@@ -6,7 +6,7 @@ Personal mycroft backend alternative to mycroft.home, written in flask
 
 # Status
 
-cyclic import bug, unusable
+unusable - learning sql and fucking things up
 
 # usage
 

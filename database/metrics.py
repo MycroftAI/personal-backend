@@ -1,17 +1,28 @@
-from sqlalchemy import Column, String, Integer, create_engine, ForeignKey
+from sqlalchemy import Column, String, Integer, create_engine, ForeignKey, Table
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.exc import IntegrityError
 
-from database.devices import Device, User
 from database import Base
 
 import time
 
 
+metrics_devices = Table('metrics_devices', Base.metadata,
+    Column('metric_id', Integer, ForeignKey('metrics.id')),
+    Column('uuid', Integer, ForeignKey('devices.uuid'))
+)
+
+
+metrics_users = Table('metrics_users', Base.metadata,
+    Column('metric_id', Integer, ForeignKey('metrics.id')),
+    Column('user_id', Integer, ForeignKey('users.id'))
+)
+
+
 class Metric(Base):
     __tablename__ = "metrics"
     created_at = Column(Integer, 'created_at', default=time.time())
-    uuid = Column(String, ForeignKey(Device.uuid))
+    uuid = Column(String, ForeignKey("Device.uuid"))
     id = Column(Integer, primary_key=True)
     name = Column(String)
     user_id = Column(String, ForeignKey('users.id'))
@@ -24,10 +35,10 @@ class Metric(Base):
     handler = Column(String)
     transcription = Column(String)
     source = Column(String)
-    devices = relationship(Device, order_by=Device.last_seen,
-                           back_populates="metrics")
-    users = relationship(Device, order_by=User.last_seen,
-                           back_populates="metrics")
+    devices = relationship("Device", back_populates="metrics",
+                           secondary=metrics_devices)
+    users = relationship("Device", back_populates="metrics",
+                         secondary=metrics_users)
 
     def __repr__(self):
         return self.name
@@ -43,7 +54,7 @@ class MetricDatabase(object):
         Base.metadata.create_all(self.db)
 
     def get_device_by_uuid(self, uuid):
-        return self.session.query(Device).filter_by(uuid=uuid).one()
+        return self.session.query("Device").filter_by(uuid=uuid).one()
 
     def add_metric(self, uuid, name, data=None):
         try:
