@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.exc import IntegrityError
 
 from sqlalchemy.ext.declarative import declarative_base
+
 Base = declarative_base()
 
 #from database.magic import MagicBase as Base
@@ -403,18 +404,18 @@ class DeviceDatabase(object):
                self.session.query(Device).filter(Device.refreshToken ==
                                                  token).first()
 
-    def add_location(self, uuid, location_data):
+    def add_location(self, uuid, location_data=None):
         device = self.get_device_by_uuid(uuid)
         if device is None:
             return False
-
-        for key in location_data:
-            if location_data[key]:
+        location_data = location_data or {}
+        for arg, val in location_data.items():
+            if val:
                 try:
-                    device.location[key] = location_data[key]
+                    setattr(device.location, arg, val)
                     self.session.commit()
                 except Exception as e:
-                    print e
+                    pass
                 except IntegrityError:
                     self.session.rollback()
 
@@ -424,13 +425,13 @@ class DeviceDatabase(object):
         device = self.get_device_by_uuid(uuid)
         if device is None:
             return False
-        for key in config_data:
-            if config_data[key]:
+        for arg, val in config_data.items():
+            if val:
                 try:
-                    device.config[key] = config_data[key]
+                    setattr(device.config, arg, val)
                     self.session.commit()
                 except Exception as e:
-                    print e
+                    pass
                 except IntegrityError:
                     self.session.rollback()
 
@@ -440,9 +441,10 @@ class DeviceDatabase(object):
         device = self.get_device_by_uuid(uuid)
         if device is None:
             return False
-        ip = IPAddress(ip_address=ip)
-        device.ips.append(ip)
-        device.user.ips.append(ip)
+        if ip not in [ip.ip_address for ip in device.ips]:
+            device.ips.append(IPAddress(ip_address=ip))
+        if ip not in [ip.ip_address for ip in device.user.ips]:
+            device.user.ips.append(ip)
         return self.commit()
 
     def add_user(self, mail=None, name="", password=""):

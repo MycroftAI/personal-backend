@@ -6,21 +6,20 @@ from flask import Flask, make_response, request, Response
 from flask_sslify import SSLify
 from database.admin import AdminDatabase
 from database.devices import DeviceDatabase
+from settings import API_VERSION, MAIL, PASSWORD, SQL_ADMINS_URI, \
+    SQL_DEVICES_URI, SSL_CERT, SSL_KEY, SSL, DEBUG
 
-API_VERSION = "v0.1"
+
 app = Flask(__name__)
 sslify = SSLify(app)
-MAIL = ""
-PASSWORD = ""
-
 
 # users in middle of pairing
 UNPAIRED_DEVICES = {}
 ENTERED_CODES = {}
 
 
-ADMINS = AdminDatabase("sqlite:///database/admins.db")
-DEVICES = DeviceDatabase("sqlite:///database/devices.db")
+ADMINS = AdminDatabase(SQL_ADMINS_URI, debug=DEBUG)
+DEVICES = DeviceDatabase(SQL_DEVICES_URI, debug=DEBUG)
 
 
 def add_response_headers(headers=None):
@@ -111,17 +110,20 @@ def hello():
     return nice_json({
         "uri": "/",
         "welcome to Personal Mycroft Backend": {
-            "author": "Jarbas"
+            "author": "JarbasAI"
         }
     })
 
 
 def start(app, port=6666):
-    cert = "{}/certs/JarbasServer.crt".format(root_dir())
-    key = "{}/certs/JarbasServer.key".format(root_dir())
-    context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-    context.load_cert_chain(cert, key)
-    app.run(host="0.0.0.0", port=port, debug=False, ssl_context=context)
+    if SSL:
+        cert = SSL_CERT
+        key = SSL_KEY
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+        context.load_cert_chain(cert, key)
+        app.run(host="0.0.0.0", port=port, debug=DEBUG, ssl_context=context)
+    else:
+        app.run(host="0.0.0.0", port=port, debug=DEBUG)
 
 
 if __name__ == "__main__":

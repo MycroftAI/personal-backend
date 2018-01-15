@@ -1,0 +1,9 @@
+API_VERSION = "v0.1"
+MAIL = ""
+PASSWORD = ""
+SQL_ADMINS_URI = "sqlite:///database/admins.db"
+SQL_DEVICES_URI = "sqlite:///database/devices.db"
+DEBUG = True
+SSL = False
+SSL_CERT = ""
+SSL_KEY = ""
