@@ -4,6 +4,8 @@ Personal mycroft backend alternative to mycroft.home, written in flask
 
 # UNDER CONSTRUCTION
 
+![](media/personalbackend.jpg)
+
 # Status
 
 you can run it, but why would you before it's finished?
