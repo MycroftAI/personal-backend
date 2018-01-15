@@ -389,6 +389,9 @@ class DeviceDatabase(object):
     def get_user_by_id(self, user_id):
         return self.session.query(User).filter(User.id == user_id).first()
 
+    def get_user_by_mail(self, mail):
+        return self.session.query(User).filter(User.mail == mail).first()
+
     def get_user_by_uuid(self, uuid):
         return self.session.query(User).filter(Device.uuid == uuid).first()
 
@@ -426,7 +429,9 @@ class DeviceDatabase(object):
             print "NOT PAIRED"
             return False
 
-        device = Device(uuid=uuid, user_id=user.id, user=user, paired=True)
+        device = self.get_device_by_uuid(uuid)
+        if not device:
+            device = Device(uuid=uuid, user_id=user.id, user=user, paired=True)
         if name:
             device.name = name
         if expires_at:
