@@ -1,10 +1,13 @@
 import requests
 from requests.exceptions import ConnectionError
 
-# filter warnings, TODO this should be removed once we stop using self signed certs
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from settings import DEBUG
 
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+if DEBUG:
+    # filter warnings, TODO this should be removed once we stop using self signed certs
+    from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 class BackendMycroftAPI(object):
@@ -21,7 +24,7 @@ class BackendMycroftAPI(object):
         try:
             response = requests.put(
                 self.url+"pair/"+code+"/"+uuid+"/"+name+"/"+mail,
-                headers=self.headers, verify=False
+                headers=self.headers, verify=not DEBUG
             )
             try:
                 return response.json()
