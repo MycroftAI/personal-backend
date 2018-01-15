@@ -1,113 +1,155 @@
-from sqlalchemy import Column, Text, String, Integer, create_engine, \
-    ForeignKey, Boolean, Table
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Text, \
+    Table, Float, create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.exc import IntegrityError
-
-from database import Base
 
 import time
 
+Base = declarative_base()
 
-device_user = Table('device_user', Base.metadata,
-    Column('uuid', Integer, ForeignKey('devices.uuid')),
-    Column('user_id', Integer, ForeignKey('users.id'))
+
+## association tables
+
+
+user_devices = Table('user_devices', Base.metadata,
+     Column('user_id', ForeignKey('users.id'), primary_key=True),
+     Column('device_id', ForeignKey('devices.uuid'), primary_key=True)
 )
 
 
-device_ips = Table('device_ips', Base.metadata,
-    Column('uuid', Integer, ForeignKey('devices.uuid')),
-    Column('ip_addresses', Integer, ForeignKey('ips.ip_address'))
+config_devices = Table('config_devices', Base.metadata,
+     Column('config_id', ForeignKey('configs.id'), primary_key=True),
+     Column('device_id', ForeignKey('devices.uuid'), primary_key=True)
 )
 
 
-device_location = Table('device_location', Base.metadata,
-    Column('uuid', Integer, ForeignKey('devices.uuid')),
-    Column('location_id', Integer, ForeignKey('locations.id'))
+config_users = Table('config_users', Base.metadata,
+     Column('config_id', ForeignKey('configs.id'), primary_key=True),
+     Column('user_id', ForeignKey('users.id'), primary_key=True)
 )
 
-
-device_metrics = Table('device_metrics', Base.metadata,
-    Column('uuid', Integer, ForeignKey('devices.uuid')),
-    Column('metrics_id', Integer, ForeignKey('metric.id'))
-)
-
-
-device_config = Table('device_config', Base.metadata,
-    Column('uuid', Integer, ForeignKey('devices.uuid')),
-    Column('config_id', Integer, ForeignKey('configs.uuid'))
-)
-
-device_skills = Table('device_skills', Base.metadata,
-    Column('uuid', Integer, ForeignKey('devices.uuid')),
-    Column('skill_names', Integer, ForeignKey('skills.name'))
-)
-
-
-device_hotwords = Table('device_hotwords', Base.metadata,
-    Column('uuid', Integer, ForeignKey('devices.uuid')),
-    Column('hotword_names', Integer, ForeignKey('hotwords.name'))
-)
-
-ip_users = Table('ip_users', Base.metadata,
-    Column('ip_address', Integer, ForeignKey('ips.ip_address')),
-    Column('user_ids', Integer, ForeignKey('users.id'))
-)
 
 ip_devices = Table('ip_devices', Base.metadata,
-    Column('ip_address', Integer, ForeignKey('ips.ip_address')),
-    Column('devices', Integer, ForeignKey('devices.uuid'))
+     Column('ip_address', ForeignKey('ips.ip_address'), primary_key=True),
+     Column('device_id', ForeignKey('devices.uuid'), primary_key=True)
+)
+
+
+ip_users = Table('ip_users', Base.metadata,
+     Column('ip_address', ForeignKey('ips.ip_address'), primary_key=True),
+     Column('user_id', ForeignKey('users.id'), primary_key=True)
+)
+
+
+location_devices = Table('location_devices', Base.metadata,
+     Column('location_id', ForeignKey('locations.id'), primary_key=True),
+     Column('device_id', ForeignKey('devices.uuid'), primary_key=True)
 )
 
 
 location_users = Table('location_users', Base.metadata,
-    Column('location', Integer, ForeignKey('locations.id')),
-    Column('user_ids', Integer, ForeignKey('users.id'))
+     Column('location_id', ForeignKey('locations.id'), primary_key=True),
+     Column('user_id', ForeignKey('users.id'), primary_key=True)
 )
 
-location_devices = Table('location_devices', Base.metadata,
-    Column('location', Integer, ForeignKey('locations.id')),
-    Column('uuids', Integer, ForeignKey('devices.uuid'))
+
+location_configs = Table('location_configs', Base.metadata,
+     Column('location_id', ForeignKey('locations.id'),  primary_key=True),
+     Column('config_id', ForeignKey('configs.id'), primary_key=True)
 )
+
 
 skill_devices = Table('skill_devices', Base.metadata,
-    Column('skill_name', Integer, ForeignKey('skills.name')),
-    Column('uuids', Integer, ForeignKey('devices.uuid'))
+     Column('skill_id', ForeignKey('skills.id'), primary_key=True),
+     Column('device_id', ForeignKey('devices.uuid'), primary_key=True)
 )
+
+
+skill_configs = Table('skill_configs', Base.metadata,
+     Column('skill_id', ForeignKey('skills.id'), primary_key=True),
+     Column('config_id', ForeignKey('configs.id'), primary_key=True)
+)
+
+
+metrics_users = Table('metrics_users', Base.metadata,
+    Column('metric_id', Integer, ForeignKey('metrics.id')),
+    Column('user_id', Integer, ForeignKey('users.id'))
+)
+
+metrics_devices = Table('metrics_devices', Base.metadata,
+    Column('metric_id', Integer, ForeignKey('metrics.id')),
+    Column('device_id', Integer, ForeignKey('devices.uuid'))
+)
+
+hotword_configs = Table('hotword_configs', Base.metadata,
+   Column('hotword_id', Integer, ForeignKey('hotwords.id')),
+   Column('config_id', Integer, ForeignKey('configs.id'))
+
+   )
+
+hotword_devices = Table('hotword_devices', Base.metadata,
+   Column('hotword_id', Integer, ForeignKey('hotwords.id')),
+   Column('device_id', Integer, ForeignKey('devices.uuid'))
+
+   )
+
+hotword_users = Table('hotword_users', Base.metadata,
+   Column('hotword_id', Integer, ForeignKey('hotwords.id')),
+   Column('user_id', Integer, ForeignKey('users.id'))
+
+   )
+
+config_stt = Table('config_stt', Base.metadata,
+    Column('config_id', Integer, ForeignKey('configs.id')),
+    Column('stt_id', Integer, ForeignKey('stt_engines.id'))
+)
+
+config_tts = Table('config_tts', Base.metadata,
+    Column('config_id', Integer, ForeignKey('configs.id')),
+    Column('tts_id', Integer, ForeignKey('tts_engines.id'))
+)
+
+config_sounds = Table('config_sounds', Base.metadata,
+    Column('config_id', Integer, ForeignKey('configs.id')),
+    Column('sound_id', Integer, ForeignKey('sounds.id'))
+)
+
+# classes
+
+
+class User(Base):
+    __tablename__ = 'users'
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    created_at = Column(String, default=time.time())
+    description = Column(Text)
+    api_key = Column(String)
+    name = Column(String, default="unknown_user")
+    mail = Column(String, nullable=False)
+    last_seen = Column(Integer, default=0)
+
+    devices = relationship("Device", back_populates="user", secondary=user_devices)
+    configs = relationship("Configuration", back_populates="user",
+                         secondary=config_users)
+    ips = relationship("IPAddress", back_populates="users",
+                           secondary=ip_users)
+    locations = relationship("Location", back_populates="user",
+                       secondary=location_users)
+    metrics = relationship("Metric", back_populates="user",
+                           secondary=metrics_users)
+    hotwords = relationship("Hotword", back_populates="user",
+                            secondary=hotword_users)
 
 
 class Device(Base):
     __tablename__ = "devices"
-    created_at = Column(Integer, default=time.time())
-    uuid = Column(Text, primary_key=True)
-    description = Column(Text)
+
+    uuid = Column(String, primary_key=True, nullable=False)
+    created_at = Column(String, default=time.time())
+    description = Column(Text, default="")
     name = Column(String, default="unknown_device")
     last_seen = Column(Integer, default=0)
-
-    user_id = Column(Integer, ForeignKey("User.id"))
-    ip_addresses = Column(String, ForeignKey("IPAddress.ip_address"))
-    location_id = Column(String, ForeignKey("Location.uuid"))
-    metrics_id = Column(String, ForeignKey("Metrics.uuid"))
-    skill_names = Column(String, ForeignKey("Skill.name"))
-    hotword_names = Column(String, ForeignKey("Hotword.name"))
-
-    user = relationship("User", order_by="User.id",
-                        back_populates="devices",
-                           secondary=device_user)
-    ips = relationship("IPAddress", order_by="IPAddress.last_seen",
-                       back_populates="devices",
-                           secondary=device_ips)
-    location = relationship("Location", order_by="Location.id",
-                            back_populates="devices",
-                           secondary=device_location)
-    skills = relationship("Skill", back_populates="devices",
-                           secondary=device_skills)
-    metrics = relationship("Metric", back_populates="users",
-                           secondary=device_metrics)
-    config = relationship("Configuration", back_populates="device",
-                           secondary=device_config)
-    hotwords = relationship("Hotword", back_populates="devices",
-                           secondary=device_hotwords)
-
     expires_at = Column(Integer, default=0)
     accessToken = Column(String)
     refreshToken = Column(String)
@@ -115,22 +157,85 @@ class Device(Base):
     subscription = Column(String, default="free")
     arch = Column(String, default="unknown")
 
+    user_id = Column(Integer, ForeignKey("users.id"))
+
+    user = relationship("User", back_populates="devices",
+                        secondary=user_devices, uselist=False, load_on_pending=True)
+
+    config = relationship("Configuration", back_populates="device",
+                           secondary=config_devices, uselist=False)
+
+    ips = relationship("IPAddress", # order_by="ips.last_seen",
+                       back_populates="devices",
+                       secondary=ip_devices)
+
+    location = relationship("Location",  # order_by="locations.id",
+                            back_populates="device",
+                            secondary=location_devices)
+    skills = relationship("Skill", back_populates="device",
+                          secondary=skill_devices)
+
+    metrics = relationship("Metric", back_populates="device",
+                           secondary=metrics_devices)
+
+    hotwords = relationship("Hotword", back_populates="device",
+                            secondary=hotword_devices)
+
+
+class Metric(Base):
+    __tablename__ = "metrics"
+    created_at = Column(Integer, default=time.time())
+    id = Column(Integer, primary_key=True, nullable=False)
+    name = Column(String)
+
+    system = Column(String)
+    start_time = Column(Integer)
+    time = Column(Integer)
+    intent_type = Column(String)
+    lang = Column(String)
+    utterance = Column(String)
+    handler = Column(String)
+    transcription = Column(String)
+    source = Column(String)
+
+    device = relationship("Device", back_populates="metrics",
+                           secondary=metrics_devices)
+    user = relationship("User", back_populates="metrics",
+                         secondary=metrics_users)
+
+
+class Skill(Base):
+    __tablename__ = "skills"
+    id = Column(Integer, primary_key=True, nullable=False)
+    created_at = Column(Integer, default=time.time())
+    path = Column(String)
+    name = Column(String)
+    folder = Column(String)
+    github = Column(String)
+    device = relationship("Device", #order_by="devices.last_seen",
+                           back_populates="skills",
+                           secondary=skill_devices, uselist=False)
+    config = relationship("Configuration",
+                          back_populates="skills",
+                          secondary=skill_configs, uselist=False)
+
+    priority = Column(Boolean, default=False)
+    blacklisted = Column(Boolean, default=False)
+
     def __repr__(self):
-        return self.uuid
+        return self.skill_name
 
 
 class IPAddress(Base):
     __tablename__ = "ips"
     created_at = Column(Integer, default=time.time())
-    ip_address = Column(String, primary_key=True)
+    ip_address = Column(String, primary_key=True, nullable=False)
     last_seen = Column(Integer, default=0)
-    uuids = Column(Integer, ForeignKey("Device.uuid"))
-    users = relationship("User", order_by="User.last_seen",
-                         back_populates="ips",
-                           secondary=ip_users)
-    devices = relationship("Device", order_by="Device.last_seen",
-                           back_populates="ips",
-                           secondary=ip_devices)
+
+    users = relationship("User",  # order_by="users.last_seen",
+                         back_populates="ips", secondary=ip_users)
+    devices = relationship("Device",  # order_by="devices.last_seen",
+                           back_populates="ips", secondary=ip_devices)
 
     def __repr__(self):
         return self.ip_address
@@ -140,7 +245,7 @@ class Location(Base):
     __tablename__ = "locations"
     created_at = Column(Integer, default=time.time())
     id = Column(Integer, primary_key=True)
-    last_seen = Column(Integer, default=0)
+    last_seen = Column(Integer, default=1)
     city = Column(String)
     region_code = Column(String)
     country_code = Column(String)
@@ -149,32 +254,123 @@ class Location(Base):
     longitude = Column(Integer, default=0)
     latitude = Column(Integer, default=0)
     timezone = Column(String)
-    users = relationship("User", order_by="User.id",
-                         back_populates="locations",
-                           secondary=location_users)
-    devices = relationship("Device", order_by="Device.last_seen",
+
+    user = relationship("User",
+                         back_populates="locations", uselist=False,
+                         secondary=location_users)
+    device = relationship("Device",
                            back_populates="location",
-                           secondary=location_devices)
+                           secondary=location_devices, uselist=False)
+    config = relationship("Configuration",
+                          back_populates="location",
+                          secondary=location_configs, uselist=False)
 
-    def __repr__(self):
-        return self.country_name
+
+class Configuration(Base):
+    __tablename__ = "configs"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    created_at = Column(String, default=time.time())
+
+    device = relationship("Device", back_populates="config",
+                           secondary=config_devices, uselist=False)
+    user = relationship("User", back_populates="configs", secondary=config_users, uselist=False)
+    location = relationship("Location", back_populates="config",
+                            secondary=location_configs, uselist=False)
+    skills = relationship("Skill", back_populates="config",
+                          secondary=skill_configs)
+    hotwords = relationship("Hotword", back_populates="config",
+                            secondary=hotword_configs)
+    sounds = relationship("Sound", back_populates="config",
+                          secondary=config_sounds)
+    stt = relationship("STT", back_populates="config",
+                       secondary=config_stt)
+    tts = relationship("TTS", back_populates="config",
+                       secondary=config_tts)
+
+    lang = Column(String)
+    system_unit = Column(String, default="metric")
+    time_format = Column(String, default="full")
+    date_format = Column(String, default="DMY")
+    opt_in = Column(Boolean, default=False)
+    confirm_listening = Column(Boolean, default=False)
+    play_wav_cmdline = Column(String,
+                              default="paplay %1 --stream-name=mycroft-voice")
+    play_mp3_cmdline = Column(String, default="mpg123 %1")
+    skills_dir = Column(String, default="/opt/mycroft/skills")
+    skills_auto_update = Column(Boolean, default=False)
+    listener_sample_rate = Column(Integer, default=16000)
+    listener_channels = Column(Integer, default=1)
+    record_wake_words = Column(Boolean, default=False)
+    record_utterances = Column(Boolean, default=False)
+    wake_word_upload = Column(Boolean, default=False)
+    phoneme_duration = Column(Integer, default=120)
+    listener_multiplier = Column(Float, default=1.0)
+    listener_energy_ratio = Column(Float, default=1.5)
+    wake_word = Column(String, default="hey mycroft")
+    stand_up_word = Column(String, default="wake up")
 
 
-class Skill(Base):
-    __tablename__ = "skills"
-    created_at = Column(Integer, default=time.time())
-    path = Column(String)
-    name = Column(String)
-    folder = Column(String, primary_key=True)
-    github = Column(String)
-    devices = relationship("Device", order_by="Device.last_seen",
-                           back_populates="skills",
-                           secondary=skill_devices)
-    priority = Column(Boolean, default=False)
-    blacklisted = Column(Boolean, default=False)
+class Hotword(Base):
+    __tablename__ = "hotwords"
+    id = Column(String, primary_key=True, nullable=False)
+    name = Column(String, default="hey mycroft")
+    module = Column(String, default="pocketsphinx")
+    phonemes = Column(String, default="HH EY . M AY K R AO F T")
+    threshold = Column(String, default="1e-90")
+    active = Column(Boolean, default=True)
+    listen = Column(Boolean, default=False)
+    utterance = Column(String, default="")
+    sound =Column(String, default="")
+    lang = Column(String, default="en-us")
 
-    def __repr__(self):
-        return self.skill_name
+    device = relationship("Device", back_populates="hotwords",
+                          secondary=hotword_devices, uselist=False)
+    user = relationship("User", back_populates="hotwords",
+                        secondary=hotword_users, uselist=False)
+    config = relationship("Configuration", back_populates="hotwords",
+                        secondary=hotword_configs, uselist=False)
+
+
+class Sound(Base):
+    __tablename__ = "sounds"
+    id = Column(Integer, primary_key=True)
+    path = Column(String, default="")
+    name = Column(String, default="")
+
+    config = relationship("Configuration", back_populates="sounds",
+                          secondary=config_sounds, uselist=False)
+
+
+class STT(Base):
+    __tablename__ = "stt_engines"
+    id = Column(Integer, primary_key=True, nullable=False)
+    name = Column(String, default="")
+    lang = Column(String, default="en-us")
+    uri = Column(String, default="")
+    token = Column(String, default="")
+    username = Column(String, default="")
+    password = Column(String, default="")
+
+    config = relationship("Configuration", back_populates="stt",
+                          secondary=config_stt, uselist=False)
+
+
+class TTS(Base):
+    __tablename__ = "tts_engines"
+    id = Column(Integer, primary_key=True, nullable=False)
+
+    name = Column(String, default="")
+    lang = Column(String, default="en-us")
+    uri = Column(String, default="")
+    token = Column(String, default="")
+    username = Column(String, default="")
+    password = Column(String, default="")
+    voice = Column(String, default="")
+    gender = Column(String, default="male")
+
+    config = relationship("Configuration", back_populates="tts",
+                          secondary=config_tts, uselist=False)
 
 
 class DeviceDatabase(object):
@@ -394,7 +590,7 @@ class DeviceDatabase(object):
             .filter_by(Device.paired == True).all()
 
     def total_users(self):
-        return self.session.query("User").count()
+        return self.session.query(User).count()
 
     def total_devices(self):
         return self.session.query(Device).count()
@@ -428,8 +624,12 @@ class DeviceDatabase(object):
         return self.session.query("TTS").filter_by("TTS.name").count()
 
     def total_metrics(self):
-        return self.session.query("Metric").count()
+        return self.session.query(Metric).count()
 
     def commit(self):
         self.session.commit()
 
+db = DeviceDatabase()
+print db.total_metrics()
+print db.total_users()
+print db.total_devices()

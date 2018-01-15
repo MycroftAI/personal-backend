@@ -18,7 +18,7 @@ class Admin(Base):
 
 
 class AdminDatabase(object):
-    def __init__(self, path='sqlite:///admins_test.db', debug=False):
+    def __init__(self, path='sqlite:///admins.db', debug=False):
         self.db = create_engine(path)
         self.db.echo = debug
 

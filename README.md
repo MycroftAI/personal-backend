@@ -6,7 +6,7 @@ Personal mycroft backend alternative to mycroft.home, written in flask
 
 # Status
 
-unusable - learning sql and fucking things up
+probably unusable - learning sql and fucking things up
 
 # usage
 
