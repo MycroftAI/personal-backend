@@ -16,6 +16,20 @@ you can run it, but why would you before it's finished?
 wait until it is finished
 
 
+configure backend by editing settings.py
+
+    API_VERSION = "v0.1"
+    MAIL = "mail to be used by your devices"
+    PASSWORD = "mail password"
+    SQL_ADMINS_URI = "sqlite:///database/admins.db"
+    SQL_DEVICES_URI = "sqlite:///database/devices.db"
+    DEBUG = True
+    SSL = False
+    SSL_CERT = "path/to.crt"
+    SSL_KEY = "path/to.key"
+    BACKEND_PORT = 6712
+    WEBSITE_PORT = 5000
+
 change url in "server" section in your default mycroft config
 
      // Address of the REMOTE server
@@ -28,7 +42,7 @@ change url in "server" section in your default mycroft config
       },
 
 
-start your backend by running python main.py
+start your backend by running main.py, start website by running website.py
 
 
 # Features

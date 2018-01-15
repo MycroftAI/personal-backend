@@ -2,7 +2,7 @@ from flask import Flask, redirect, url_for, render_template, request, session
 from flask_sslify import SSLify
 from forms import LoginForm
 from database.users import *
-from settings import SSL, SSL_CERT, SSL_KEY, DEBUG
+from settings import SSL, SSL_CERT, SSL_KEY, DEBUG, WEBSITE_PORT
 import helpers
 import json
 import os
@@ -80,6 +80,7 @@ if __name__ == "__main__":
         import ssl
         context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
         context.load_cert_chain(SSL_CERT, SSL_KEY)
-        app.run(debug=DEBUG, ssl_context=context, use_reloader=True)
+        app.run(debug=DEBUG, port=WEBSITE_PORT, ssl_context=context,
+                use_reloader=True)
     else:
-        app.run(debug=DEBUG, use_reloader=True)
+        app.run(debug=DEBUG, port=WEBSITE_PORT, use_reloader=True)
