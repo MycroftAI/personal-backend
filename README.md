@@ -6,7 +6,7 @@ Personal mycroft backend alternative to mycroft.home, written in flask
 
 # Status
 
-probably unusable - learning sql and fucking things up
+you can run it, but why would you before it's finished?
 
 # usage
 
@@ -51,6 +51,7 @@ start your backend by running python main.py
 - STT using google default key
 
 - sql database
+
 
 # remote admin api
 

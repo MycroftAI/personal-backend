@@ -131,17 +131,17 @@ class User(Base):
     mail = Column(String, nullable=False, unique=True)
     last_seen = Column(Integer, default=0)
 
-    devices = relationship("Device", back_populates="user", secondary=user_devices, cascade='all,delete')
+    devices = relationship("Device", back_populates="user", secondary=user_devices)
     configs = relationship("Configuration", back_populates="user",
-                         secondary=config_users, cascade='all,delete')
+                         secondary=config_users)
     ips = relationship("IPAddress", back_populates="users",
                            secondary=ip_users)
     locations = relationship("Location", back_populates="user",
-                       secondary=location_users, cascade='all,delete')
+                       secondary=location_users)
     metrics = relationship("Metric", back_populates="user",
-                           secondary=metrics_users, cascade='all,delete')
+                           secondary=metrics_users)
     hotwords = relationship("Hotword", back_populates="user",
-                            secondary=hotword_users, cascade='all,delete')
+                            secondary=hotword_users)
 
 
 class Device(Base):
@@ -162,10 +162,10 @@ class Device(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
 
     user = relationship("User", back_populates="devices",
-                        secondary=user_devices, uselist=False, load_on_pending=True)
+                        secondary=user_devices, uselist=False)
 
     config = relationship("Configuration", back_populates="device",
-                           secondary=config_devices, uselist=False, cascade='all,delete')
+                           secondary=config_devices, uselist=False)
 
     ips = relationship("IPAddress", # order_by="ips.last_seen",
                        back_populates="devices",
@@ -173,15 +173,15 @@ class Device(Base):
 
     location = relationship("Location",  # order_by="locations.id",
                             back_populates="device",
-                            secondary=location_devices)
+                            secondary=location_devices, uselist=False)
     skills = relationship("Skill", back_populates="device",
-                          secondary=skill_devices, cascade='all,delete')
+                          secondary=skill_devices)
 
     metrics = relationship("Metric", back_populates="device",
                            secondary=metrics_devices)
 
     hotwords = relationship("Hotword", back_populates="device",
-                            secondary=hotword_devices, cascade='all,delete')
+                            secondary=hotword_devices)
 
 
 class Metric(Base):
@@ -194,7 +194,7 @@ class Metric(Base):
     start_time = Column(Integer)
     time = Column(Integer)
     intent_type = Column(String)
-    lang = Column(String)
+    lang = Column(String, default="en-us")
     utterance = Column(String)
     handler = Column(String)
     transcription = Column(String)
@@ -223,9 +223,6 @@ class Skill(Base):
 
     priority = Column(Boolean, default=False)
     blacklisted = Column(Boolean, default=False)
-
-    def __repr__(self):
-        return self.skill_name
 
 
 class IPAddress(Base):
@@ -286,13 +283,13 @@ class Configuration(Base):
     hotwords = relationship("Hotword", back_populates="config",
                             secondary=hotword_configs)
     sounds = relationship("Sound", back_populates="config",
-                          secondary=config_sounds, cascade='all,delete')
+                          secondary=config_sounds)
     stt = relationship("STT", back_populates="config",
-                       secondary=config_stt, cascade='all,delete')
+                       secondary=config_stt, uselist=False)
     tts = relationship("TTS", back_populates="config",
-                       secondary=config_tts, cascade='all,delete')
+                       secondary=config_tts, uselist=False)
 
-    lang = Column(String)
+    lang = Column(String, default="en-us")
     system_unit = Column(String, default="metric")
     time_format = Column(String, default="full")
     date_format = Column(String, default="DMY")
@@ -341,7 +338,6 @@ class Sound(Base):
     id = Column(Integer, primary_key=True)
     path = Column(String, default="")
     name = Column(String, default="")
-
     config = relationship("Configuration", back_populates="sounds",
                           secondary=config_sounds, uselist=False)
 
@@ -355,7 +351,6 @@ class STT(Base):
     token = Column(String, default="")
     username = Column(String, default="")
     password = Column(String, default="")
-
     config = relationship("Configuration", back_populates="stt",
                           secondary=config_stt, uselist=False)
 
@@ -363,7 +358,6 @@ class STT(Base):
 class TTS(Base):
     __tablename__ = "tts_engines"
     id = Column(Integer, primary_key=True, nullable=False)
-
     name = Column(String, default="")
     lang = Column(String, default="en-us")
     uri = Column(String, default="")
@@ -395,45 +389,151 @@ class DeviceDatabase(object):
         return self.session.query(User).filter(User.mail == mail).first()
 
     def get_user_by_uuid(self, uuid):
-        return self.session.query(User).filter(Device.uuid == uuid).first()
+        device = self.session.query(Device).filter(Device.uuid ==
+                                                   uuid).first()
+        if device is not None:
+            return device.user
 
     def get_device_by_uuid(self, uuid):
         return self.session.query(Device).filter(Device.uuid == uuid).first()
 
-    def add_user(self, mail=None, name="", password="", pairing_code=""):
-        user = self.session.query(User).filter(User.mail == mail).first()
-        try:
-            if not user:
-                user_id = self.total_users() + 1
-                user = User(name=name, mail=mail, password=password,
-                            pairing_code=pairing_code, id=user_id)
-                self.session.add(user)
-            else:
-                # no changing mails
-                if name:
-                    user.name = name
-                if password:
-                    user.password = password
-                if pairing_code:
-                    user.pairing_code = pairing_code
-            self.session.commit()
-            return True
-        except IntegrityError:
-            self.session.rollback()
-        return False
+    def get_device_by_token(self, token):
+        return self.session.query(Device).filter(Device.accessToken ==
+                                                 token).first() or \
+               self.session.query(Device).filter(Device.refreshToken ==
+                                                 token).first()
 
-    def add_device(self, pairing_code, uuid, name=None, expires_at=None,
+    def add_location(self, uuid, location_data):
+        device = self.get_device_by_uuid(uuid)
+        if device is None:
+            return False
+
+        for key in location_data:
+            if location_data[key]:
+                try:
+                    device.location[key] = location_data[key]
+                    self.session.commit()
+                except Exception as e:
+                    print e
+                except IntegrityError:
+                    self.session.rollback()
+
+        return True
+
+    def add_config(self, uuid, config_data):
+        device = self.get_device_by_uuid(uuid)
+        if device is None:
+            return False
+        for key in config_data:
+            if config_data[key]:
+                try:
+                    device.config[key] = config_data[key]
+                    self.session.commit()
+                except Exception as e:
+                    print e
+                except IntegrityError:
+                    self.session.rollback()
+
+        return True
+
+    def add_ip(self, uuid, ip):
+        device = self.get_device_by_uuid(uuid)
+        if device is None:
+            return False
+        ip = IPAddress(ip_address=ip)
+        device.ips.append(ip)
+        device.user.ips.append(ip)
+        return self.commit()
+
+    def add_user(self, mail=None, name="", password=""):
+        user = self.session.query(User).filter(User.mail == mail).first()
+        if user is None:
+            user_id = self.total_users() + 1
+            user = User(name=name, mail=mail, password=password, id=user_id)
+            self.session.add(user)
+        else:
+            if mail:
+                user.mail = mail
+            if name:
+                user.name = name
+            if password:
+                user.password = password
+        return self.commit()
+
+    def add_device(self, uuid, name=None,
+                   expires_at=None,
                    accessToken=None,
-                   refreshToken=None):
-        user = self.get_user_by_pairing_code(pairing_code)
-        print user
-        if not user:
+                   refreshToken=None, mail=None):
+
+        user = self.get_user_by_mail(mail) or self.get_user_by_uuid(uuid)
+        if user is None:
             print "NOT PAIRED"
             return False
 
         device = self.get_device_by_uuid(uuid)
-        if not device:
+        if device is None:
             device = Device(uuid=uuid, user_id=user.id, user=user, paired=True)
+            # create default configuration
+            config = Configuration(id=self.total_configs() + 1,
+                                   device_id=device.uuid, user=user)
+
+            # add location entry to config
+            location = Location(
+                id=self.session.query(Configuration).count() + 1,
+                device=device, user=user)
+            config.location = location
+
+            # add default STT and TTS engines to config
+            config.stt = STT(id=self.session.query(STT).count() + 1,
+                             name="mycroft")
+            config.tts = TTS(id=self.session.query(TTS).count() + 1,
+                             name="mimic")
+
+            # add default hey mycroft hotword to config
+            hotword = Hotword(id=self.session.query(Hotword).count() + 1,
+                              device=device,
+                              user=user)
+            wakeword = Hotword(id=self.session.query(Hotword).count() + 1,
+                              device=device,
+                              user=user, phonemes="W EY K . AH P",
+                               threshold="1e-20", name="wake up")
+            config.hotwords.append(hotword)
+            config.hotwords.append(wakeword)
+
+            # add default priority skills
+            config.skills.append(
+                Skill(id=self.session.query(Skill).count() + 1,
+                      name="pairing", folder="skill-pairing",
+                      priority=True, device=device))
+
+            # add default blacklisted skills
+            config.skills.append(
+                Skill(id=self.session.query(Skill).count() + 1,
+                      name="skill-media", folder="skill-media",
+                      blacklisted=True, device=device))
+            config.skills.append(
+                Skill(id=self.session.query(Skill).count() + 1,
+                      name="send-sms", folder="send-sms",
+                      blacklisted=True, device=device))
+            config.skills.append(
+                Skill(id=self.session.query(Skill).count() + 1,
+                      name="skill-wolfram-alpha",
+                      folder="skill-wolfram-alpha",
+                      blacklisted=True, device=device))
+
+            # add default sounds
+            config.sounds.append(
+                Sound(id=self.session.query(Sound).count() + 1,
+                      name="start_listening",
+                      path="snd/start_listening.wav", ))
+            config.sounds.append(
+                Sound(id=self.session.query(Sound).count() + 1,
+                      name="end_listening",
+                      path="snd/end_listening.wav", ))
+            # add config to device
+            device.config = config
+            self.session.add(device)
+
         if name:
             device.name = name
         if expires_at:
@@ -443,61 +543,7 @@ class DeviceDatabase(object):
         if refreshToken:
             device.refreshToken = refreshToken
 
-        # create default configuration
-        config = Configuration(id=self.total_configs() + 1,
-                               device_id=device.uuid, user=user)
-
-        # add location entry to config
-        location = Location(id=self.session.query(Configuration).count() + 1,
-                            device=device, user=user)
-        config.location = location
-
-        # add default STT and TTS engines to config
-        config.stt = STT(id=self.session.query(STT).count() + 1)
-        config.tts = TTS(id=self.session.query(TTS).count() + 1)
-
-        # add default hey mycroft hotword to config
-        hotword = Hotword(id=self.session.query(Hotword).count() + 1,
-                          device=device,
-                          user=user)
-        config.hotwords.append(hotword)
-
-        # add default priority skills
-        config.skills.append(Skill(id=self.session.query(Skill).count() + 1,
-                                   name="pairing", folder="skill-pairing",
-                                   priority=True, device=device))
-
-        # add default blacklisted skills
-        config.skills.append(Skill(id=self.session.query(Skill).count() + 1,
-                                   name="skill-media", folder="skill-media",
-                                   blacklisted=True, device=device))
-        config.skills.append(Skill(id=self.session.query(Skill).count() + 1,
-                                   name="send-sms", folder="send-sms",
-                                   blacklisted=True, device=device))
-        config.skills.append(Skill(id=self.session.query(Skill).count() + 1,
-                                   name="skill-wolfram-alpha", folder="skill-wolfram-alpha",
-                                   blacklisted=True, device=device))
-
-        # add default sounds
-        config.sounds.append(Sound(id=self.session.query(Sound).count() + 1,
-                                   name="start_listening",
-                                   path="snd/start_listening.wav",))
-        config.sounds.append(Sound(id=self.session.query(Sound).count() + 1,
-                                   name="end_listening",
-                                   path="snd/end_listening.wav", ))
-        # add config to device
-        device.config = config
-
-        try:
-            self.session.add(device)
-            self.session.commit()
-            return True
-        except IntegrityError:
-            self.session.rollback()
-        return False
-
-    def total_hotwords(self):
-        return self.session.query(Hotword).count()
+        return self.commit()
 
     def total_users(self):
         return self.session.query(User).count()
@@ -509,16 +555,9 @@ class DeviceDatabase(object):
         return self.session.query(Configuration).count()
 
     def commit(self):
-        self.session.commit()
-
-
-db = DeviceDatabase(debug=False)
-print db.total_users()
-print db.total_devices()
-print db.total_configs()
-print db.add_device("666", "666")
-print db.add_user("mail", "jarbas", "pass", "666")
-print db.add_device("666", "666")
-print db.total_users()
-print db.total_devices()
-print db.total_configs()
+        try:
+            self.session.commit()
+            return True
+        except IntegrityError:
+            self.session.rollback()
+        return False

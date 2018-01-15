@@ -15,12 +15,12 @@ PASSWORD = ""
 
 
 # users in middle of pairing
-UNPAIRED_USERS = {}
+UNPAIRED_DEVICES = {}
 ENTERED_CODES = {}
 
 
-ADMINS = AdminDatabase(debug=True)
-DEVICES = DeviceDatabase(debug=True)
+ADMINS = AdminDatabase("sqlite:///database/admins.db")
+DEVICES = DeviceDatabase("sqlite:///database/devices.db")
 
 
 def add_response_headers(headers=None):
@@ -58,9 +58,8 @@ def donation(f):
 def check_auth(api_key):
     """This function is called to check if a api key is valid."""
     device = DEVICES.get_device_by_token(api_key)
-    if not len(device):
+    if not device:
         return False
-    device = device[0]
     if device.expires_at < time.time():
         return False
     return True
@@ -68,8 +67,8 @@ def check_auth(api_key):
 
 def check_admin_auth(api_key):
     """This function is called to check if a api key is valid."""
-    user = ADMINS.get_user_by_api_key(api_key)
-    if not len(user):
+    users = ADMINS.get_user_by_api_key(api_key)
+    if not len(users):
         return False
     return True
 

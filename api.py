@@ -16,11 +16,11 @@ class BackendMycroftAPI(object):
         self.timeout = 10
         self.wait_time = 0.5
 
-    def pair(self, code, uuid, name="jarbas"):
+    def pair(self, code, uuid, mail, name="jarbas"):
         ''' add a new user, requires admin api '''
         try:
             response = requests.put(
-                self.url+"pair/"+code+"/"+uuid+"/"+name,
+                self.url+"pair/"+code+"/"+uuid+"/"+name+"/"+mail,
                 headers=self.headers, verify=False
             )
             try:
@@ -34,7 +34,10 @@ class BackendMycroftAPI(object):
 
 if __name__ == "__main__":
     ap = BackendMycroftAPI("admin_key")
-    name = "jarbas"
-    print ap.pair("TES3NY", "ae4928a3-cd0b-49d7-8109-cbb0998d082a", name)
+    name = "jarbasX"
+    code = "23AL0F"
+    uuid = "9993b87a-7693-4648-9955-6b5ab945ca8e"
+    mail = "fakemail2@not_real.com"
+    print ap.pair(code, uuid, mail, name)
 
 

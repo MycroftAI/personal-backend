@@ -1,23 +1,25 @@
 from base import app, noindex, donation, requires_admin, nice_json, \
-    API_VERSION, UNPAIRED_USERS, DEVICES, start
+    API_VERSION, UNPAIRED_DEVICES, DEVICES, start
 from flask import request, Response
 import time
-from database import gen_api
+from database import gen_api, model_to_dict
 
 
-@app.route("/" + API_VERSION + "/pair/<code>/<uuid>/<name>", methods=['PUT'])
+@app.route("/" + API_VERSION + "/pair/<code>/<uuid>/<name>/<mail>",
+           methods=['PUT'])
 @noindex
 @donation
 @requires_admin
-def pair(code, uuid, name="unknown"):
+def pair(code, uuid, name, mail):
     # pair
     result = {"paired": False}
-    if uuid in UNPAIRED_USERS:
+    if uuid in UNPAIRED_DEVICES:
         # auto - pair ?
-        real_code =UNPAIRED_USERS[uuid]
+        real_code =UNPAIRED_DEVICES[uuid]
         if real_code == code:
-            UNPAIRED_USERS.pop(uuid)
-            DEVICES.add_device(uuid, name, paired=True)
+            DEVICES.add_user(mail, name)
+            if DEVICES.add_device(uuid, mail=mail):
+                UNPAIRED_DEVICES.pop(uuid)
             result = {"paired": True}
     return nice_json(result)
 
@@ -28,16 +30,14 @@ def pair(code, uuid, name="unknown"):
 def token():
     api = request.headers.get('Authorization', '').replace("Bearer ", "")
     device = DEVICES.get_device_by_token(api)
-    if not len(device):
+    if device is None:
         return Response(
             'Could not verify your access level for that URL.\n'
             'You have to authenticate with proper credentials', 401,
             {'WWW-Authenticate': 'Basic realm="NOT PAIRED"'})
 
-    device = device[0]
-
     # token to refresh expired token
-    if device.refreshToken != api:
+    if device.refreshToken is None or device.refreshToken != api:
         return Response(
             'Could not verify your access level for that URL.\n'
             'You have to authenticate with proper credentials', 401,
@@ -47,16 +47,11 @@ def token():
     access_token = gen_api()
     new_refresh_token = gen_api()
 
-    device.expires_at = time.time() + 72000
-    device.accessToken = access_token
-    device.refreshToken = new_refresh_token
-    DEVICES.commit()
+    DEVICES.add_device(device.uuid, expires_at=time.time() + 72000,
+                       accessToken=access_token,
+                       refreshToken=new_refresh_token)
 
-    result = {"expires_at": device.expires_at, "accessToken": access_token,
-              "refreshToken": new_refresh_token, "uuid": device.uuid,
-              "name": device.device_name}
-
-    return nice_json(result)
+    return nice_json(model_to_dict(device))
 
 
 if __name__ == "__main__":

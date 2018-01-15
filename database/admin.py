@@ -47,7 +47,7 @@ class AdminDatabase(object):
         return True
 
     def get_user_by_api_key(self, api_key):
-        return self.session.query(Admin).filter_by(api_key=api_key).one()
+        return self.session.query(Admin).filter_by(api_key=api_key).all()
 
     def get_user_by_name(self, name):
         return self.session.query(Admin).filter_by(name=name).all()
@@ -69,5 +69,11 @@ class AdminDatabase(object):
     def commit(self):
         self.session.commit()
 
+if __name__ == "__main__":
+    db = AdminDatabase(debug=True)
+    name = "jarbas"
+    mail = "jarbasai@mailfence.com"
+    api = "admin_key"
+    db.add_user(name, mail, api)
 
 

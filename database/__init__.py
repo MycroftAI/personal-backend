@@ -1,4 +1,3 @@
-from sqlalchemy.ext.declarative import declarative_base
 import os
 import base64
 import json
@@ -7,8 +6,6 @@ from os.path import dirname, join, exists
 
 
 __author__ = "jarbas"
-
-Base = declarative_base()
 
 
 def gen_api(user="demo_user", save=False):
@@ -54,6 +51,11 @@ def gen_admin_api(user="admin", save=True):
             data = json.dumps(users)
             f.write(data)
     return k
+
+
+def model_to_dict(obj):
+    serialized_data = {c.key: getattr(obj, c.key) for c in obj.__table__.columns}
+    return serialized_data
 
 if __name__ == "__main__":
     gen_admin_api("jarbas")
