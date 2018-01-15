@@ -34,10 +34,10 @@ class BackendMycroftAPI(object):
 
 if __name__ == "__main__":
     ap = BackendMycroftAPI("admin_key")
-    name = "jarbasX"
+    username = "jarbasX"
     code = "XQFTNM"
     uuid = "cc3524c7-ff52-42b3-af8f-de89249b19c8"
     mail = "fakemail2@not_real.com"
-    print ap.pair(code, uuid, mail, name)
+    print ap.pair(code, uuid, mail, username)
 
 

@@ -6,8 +6,6 @@ Personal mycroft backend alternative to mycroft.home, written in flask
 
 ![](media/personalbackend.jpg)
 
-# Status
-
 you can run it, but why would you before it's finished?
 
 # usage
@@ -75,12 +73,14 @@ start your backend by running main.py, start website by running website.py
 quickly pair a device by
 
 
-    from src.api import BackendMycroftAPI
+    from api import BackendMycroftAPI
 
     ap = BackendMycroftAPI("admin_key")
-
-    print ap.pair("KHSCLA", "489e9dcb-d657-49c0-99c2-1e0f7a8f602e")
-
+    username = "jarbasX"
+    code = "XQFTNM"
+    uuid = "cc3524c7-ff52-42b3-af8f-de89249b19c8"
+    mail = "fakemail2@not_real.com"
+    print ap.pair(code, uuid, mail, username)
 
 # TODOS
 
