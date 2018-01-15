@@ -124,9 +124,9 @@ class User(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     created_at = Column(String, default=time.time())
     description = Column(Text)
-    api_key = Column(String)
+    pairing_code = Column(String)
     name = Column(String, default="unknown_user")
-    mail = Column(String, nullable=False)
+    mail = Column(String, nullable=False, unique=True)
     last_seen = Column(Integer, default=0)
 
     devices = relationship("Device", back_populates="user", secondary=user_devices)
@@ -270,6 +270,8 @@ class Configuration(Base):
     __tablename__ = "configs"
 
     id = Column(Integer, primary_key=True, nullable=False)
+    device_id = Column(Integer, ForeignKey("devices.uuid"), nullable=False)
+
     created_at = Column(String, default=time.time())
 
     device = relationship("Device", back_populates="config",
@@ -381,119 +383,50 @@ class DeviceDatabase(object):
         self.session = Session()
         Base.metadata.create_all(self.db)
 
-    def get_user_by_name(self, name):
-        return self.session.query("User").filter_by("User.name" == name).all()
+    def get_user_by_pairing_code(self, pairing_code):
+        return self.session.query(User).filter(User.pairing_code == pairing_code).first()
 
-    def get_user_by_mail(self, mail):
-        return self.session.query("User").filter_by("User.mail" == mail).all()
+    def get_user_by_id(self, user_id):
+        return self.session.query(User).filter(User.id == user_id).first()
 
-    def get_user_by_api_key(self, api_key):
-        return self.session.query("User").filter_by("User.api_key"
-                                                  == api_key).all()
-
-    def get_user_by_device(self, uuid):
-        return self.session.query("User").filter_by(Device.uuid == uuid).all()
-
-    def get_user_by_device_name(self, name):
-        return self.session.query("User").filter_by(
-            Device.device_name == name).all()
-
-    def get_user_by_ip(self, ip):
-        return self.session.query("User").filter_by(IPAddress.ip_address ==
-                                                  ip).all()
-
-    def get_user_by_wakeword(self, wakeword):
-        return self.session.query("User").filter_by(
-            "Configuration.wake_word" == wakeword).all()
-
-    def get_user_by_hotword(self, hotword):
-        return self.session.query("User").filter_by("Hotword.name" == hotword)
-
-    def get_user_by_lang(self, lang):
-        return self.session.query("User").filter_by(
-            "Configuration.lang" == lang).all()
-
-    def get_user_by_country(self, country):
-        return self.session.query("User").filter_by(
-            Location.country_name == country).all()
-
-    def get_user_by_city(self, city):
-        return self.session.query("User").filter_by(Location.city == city).all()
-
-    def get_user_by_timezone(self, timezone):
-        return self.session.query("User").filter_by(
-            Location.timezone == timezone).all()
+    def get_user_by_uuid(self, uuid):
+        return self.session.query(User).filter(Device.uuid == uuid).first()
 
     def get_device_by_uuid(self, uuid):
-        return self.session.query(Device).filter_by(Device.uuid == uuid).all()
+        return self.session.query(Device).filter(Device.uuid == uuid).first()
 
-    def get_device_by_name(self, name):
-        return self.session.query(Device).filter_by(Device.name == name).all()
-
-    def get_device_by_user(self, name):
-        return self.session.query(Device).filter_by("User.name" == name).all()
-
-    def get_device_by_ip(self, ip):
-        return self.session.query(Device).filter_by(
-            IPAddress.ip_adress == ip).all()
-
-    def get_device_by_wakeword(self, wakeword):
-        return self.session.query(Device).filter_by(
-            "Configuration.wake_word" == wakeword).all()
-
-    def get_device_by_hotword(self, hotword):
-        return self.session.query(Device).filter_by(
-            "Hotword.name" == hotword).all()
-
-    def get_device_by_lang(self, lang):
-        return self.session.query(Device).filter_by(
-            "Configuration.lang" == lang).all()
-
-    def get_device_by_country(self, country):
-        return self.session.query(Device).filter_by(
-            Location.country == country).all()
-
-    def get_device_by_city(self, city):
-        return self.session.query(Device).filter_by(
-            Location.city == city).all()
-
-    def get_device_by_token(self, token):
-        return self.session.query(Device).filter_by(
-            Device.accessToken == token).all()
-
-    def get_device_by_timezone(self, timezone):
-        return self.session.query(Device).filter_by(
-            Location.timezone == timezone).all()
-
-    def get_config_by_user(self, name):
-        return self.session.query("Configuration").filter_by(
-           "User.name" == name).all()
-
-    def get_config_by_device(self, uuid):
-        return self.session.query("Configuration").filter_by(
-            Device.uuid == uuid).one()
-
-    def get_location_by_device(self, uuid):
-        return self.session.query(Location).filter_by(
-            Device.uuid == uuid).one()
-
-    def get_config_by_device_name(self, name):
-        return self.session.query("Configuration").filter_by(
-            Device.name == name).all()
-
-    def add_user(self, mail=None, name="", password="", api=""):
-        user = User(name=name, mail=mail, password=password, api_key=api)
+    def add_user(self, mail=None, name="", password="", pairing_code=""):
+        user = self.session.query(User).filter(User.mail == mail).first()
         try:
-            self.session.add(user)
+            if not user:
+                user_id = self.total_users() + 1
+                user = User(name=name, mail=mail, password=password,
+                            pairing_code=pairing_code, id=user_id)
+                self.session.add(user)
+            else:
+                # no changing mails
+                if name:
+                    user.name = name
+                if password:
+                    user.password = password
+                if pairing_code:
+                    user.pairing_code = pairing_code
             self.session.commit()
             return True
         except IntegrityError:
             self.session.rollback()
         return False
 
-    def add_device(self, uuid, name=None, expires_at=None, accessToken=None,
-                   refreshToken=None, paired=False):
-        device = Device(uuid=uuid)
+    def add_device(self, pairing_code, uuid, name=None, expires_at=None,
+                   accessToken=None,
+                   refreshToken=None):
+        user = self.get_user_by_pairing_code(pairing_code)
+        print user
+        if not user:
+            print "NOT PAIRED"
+            return False
+
+        device = Device(uuid=uuid, user_id=user.id, user=user, paired=True)
         if name:
             device.name = name
         if expires_at:
@@ -502,8 +435,10 @@ class DeviceDatabase(object):
             device.accessToken = accessToken
         if refreshToken:
             device.refreshToken = refreshToken
-        if paired:
-            device.paired = paired
+
+        config = Configuration(id=self.total_configs() + 1,
+                               device_id=device.uuid)
+        device.config = config
 
         try:
             self.session.add(device)
@@ -513,82 +448,6 @@ class DeviceDatabase(object):
             self.session.rollback()
         return False
 
-    def add_location(self, uuid, data=None):
-        data = data or {}
-        try:
-            location = Location(city=data.get("city", ""),
-                                region_code=data.get("region_code", ""),
-                                country_code=data.get('country_code', ""),
-                                country_name=data.get("country_name", ""),
-                                region=data.get("region", ""),
-                                longitude=data.get("longitude", 0),
-                                latitude=data.get("latitude", 0),
-                                timezone=data.get("timezone", ""),
-                                id=self.total_locations()+1,
-                                uuid=uuid)
-            self.session.add(location)
-            self.session.commit()
-            return True
-        except IntegrityError:
-            self.session.rollback()
-        return False
-
-    def add_metric(self, uuid, name, data=None):
-        data = data or {}
-        try:
-            metric = Metric(uuid=uuid, id=self.total_metrics() +1, name=name)
-            for key in data:
-                try:
-                    metric[key] = data[key]
-                except Exception as e:
-                    print e
-            self.session.add(metric)
-            self.session.commit()
-            return True
-        except IntegrityError:
-            self.session.rollback()
-        return False
-
-    def add_config(self, uuid, data=None):
-        data = data or {}
-        config = Configuration(uuid=uuid)
-        for key in data:
-            try:
-                config[key] = data[key]
-            except Exception as e:
-                print e
-        try:
-            self.session.add(config)
-            self.session.commit()
-            return True
-        except IntegrityError:
-            self.session.rollback()
-        return False
-
-    def update_user_timestamp(self, mail, timestamp):
-        user = self.get_user_by_mail(mail)
-        if user:
-            user = user[0]
-        else:
-            return False
-        user.last_seen = timestamp
-        self.commit()
-        return True
-
-    def update_device_timestamp(self, uuid, timestamp):
-        device = self.get_device_by_uuid(uuid)
-        if device:
-            device = device[0]
-        else:
-            return False
-        device.last_seen = timestamp
-        self.commit()
-        return True
-
-    def is_paired(self, uuid):
-        return self.session.query(Device).filter_by(Device.uuid == uuid)\
-            .filter_by(Device.paired == True).all()
-
     def total_users(self):
         return self.session.query(User).count()
 
@@ -596,40 +455,18 @@ class DeviceDatabase(object):
         return self.session.query(Device).count()
 
     def total_configs(self):
-        return self.session.query("Configuration").count()
-
-    def total_locations(self):
-        return self.session.query(Location).count()
-
-    def total_hotwords(self):
-        return self.session.query("Hotword").count()
-
-    def total_skills(self):
-        return self.session.query(Skill).filter_by(Skill.name).count()
-
-    def total_ips(self):
-        return self.session.query(IPAddress).count()
-
-    def total_langs(self):
-        return self.session.query("Configuration").filter_by("Configuration.lang").count()
-
-    def total_countries(self):
-        return self.session.query("Configuration").filter_by(
-            Location.country_code).count()
-
-    def total_stt(self):
-        return self.session.query("STT").filter_by("STT.name").count()
-
-    def total_tts(self):
-        return self.session.query("TTS").filter_by("TTS.name").count()
-
-    def total_metrics(self):
-        return self.session.query(Metric).count()
+        return self.session.query(Configuration).count()
 
     def commit(self):
         self.session.commit()
 
 db = DeviceDatabase()
-print db.total_metrics()
 print db.total_users()
 print db.total_devices()
+print db.total_configs()
+print db.add_device("666", "666")
+print db.add_user("mail", "jarbas", "pass", "666")
+print db.add_device("666", "666")
+print db.total_users()
+print db.total_devices()
+print db.total_configs()
