@@ -128,7 +128,7 @@ class User(Base):
     created_at = Column(String, default=time.time())
     password = Column(Text)
     pairing_code = Column(String)
-    name = Column(String, default="unknown_user")
+    name = Column(String, default="unknown_user", unique=True)
     mail = Column(String, nullable=False, unique=True)
     last_seen = Column(Integer, default=0)
 
@@ -299,7 +299,7 @@ class Configuration(Base):
     play_wav_cmdline = Column(String,
                               default="paplay %1 --stream-name=mycroft-voice")
     play_mp3_cmdline = Column(String, default="mpg123 %1")
-    skills_dir = Column(String, default="/opt/mycroft/skills")
+    skills_dir = Column(String, default="~/.mycroft/skills")
     skills_auto_update = Column(Boolean, default=False)
     listener_sample_rate = Column(Integer, default=16000)
     listener_channels = Column(Integer, default=1)

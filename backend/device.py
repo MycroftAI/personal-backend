@@ -1,8 +1,8 @@
-from base import app, noindex, donation, nice_json, \
+from backend.base import app, noindex, donation, nice_json, \
     API_VERSION, UNPAIRED_DEVICES, DEVICES, start, requires_auth, MAIL, \
     PASSWORD
 from flask import redirect, url_for, request, Response
-from backend_utils import geo_locate, generate_code, location_dict
+from backend.backend_utils import geo_locate, generate_code, location_dict
 from database import gen_api, model_to_dict
 import yagmail
 import time
@@ -54,19 +54,14 @@ def setting(uuid=""):
 
         result["skills"] = {"directory": device.config.skills_dir,
                             "auto_update": device.config.skills_auto_update,
-                            #"blacklisted_skills": blacklisted,
-                            #"priority_skills": priority}
-
-                            # removed because hard coded parsing does not
-                            # allow lists due to the way stt and tts are
-                            # stored in mycroft.home.ai
-
-                            }
+                            "blacklisted_skills": blacklisted,
+                            "priority_skills": priority}
 
         cleans += ["listener_energy_ratio", "record_wake_words",
                    "record_utterances", "wake_word_upload", "stand_up_word",
                    "wake_word", "listener_sample_rate", "listener_channels",
                     "listener_multiplier", "phoneme_duration"]
+
         result["listener"] = {
             "sample_rate": result["listener_sample_rate"],
             "channels": result["listener_channels"],

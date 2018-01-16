@@ -1,4 +1,4 @@
-from base import app, noindex, donation, requires_admin, nice_json, \
+from backend.base import app, noindex, donation, requires_admin, nice_json, \
     API_VERSION, UNPAIRED_DEVICES, DEVICES, start
 from flask import request, Response
 import time

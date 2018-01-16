@@ -55,4 +55,18 @@ $(document).ready(function() {
       }
     })
   })
+
+  $(document).on("click", "#pair", function() {
+    $.post({
+      type: "POST",
+      url: "/devices",
+      data: {"code": $("#devices-code").val(),
+             "name": $("#devices-name").val()},
+      success: function(response){
+        var status = JSON.parse(response)['status']
+        if (status === 'Paired') {location.reload()}
+        else {message(status, shake=true, id="devices-code")}
+      }
+    })
+  })
 })

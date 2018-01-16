@@ -1,7 +1,7 @@
 import ssl
 import time
 from functools import wraps
-from backend_utils import root_dir, nice_json
+from backend.backend_utils import root_dir, nice_json
 from flask import Flask, make_response, request, Response
 from flask_sslify import SSLify
 from database.admin import AdminDatabase

@@ -4,37 +4,30 @@
 <section class="hero is-primary is-bold is-small">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <div id="settings" class="settings-box">
-        <div class="settings-area">    
-          <h1 class="title">User Settings</h1>
+      <div id="devices" class="devices-box">
+        <div class="devices-area">
+          <h1 class="title">Device Settings</h1>
           <div class="field">
             <p class="control has-icons-left">
-              <input id="settings-user" class="input is-success" type="text" placeholder="{{user.name}}" readonly="readonly">
+              <input id="devices-name" class="input is-success" type="text"
+                     placeholder="name your device">
               <span class="icon is-small is-left">
-                <i class="fa fa-user"></i>
+                <i class="fa fa-laptop"></i>
               </span>
             </p>
           </div>
           <div class="field">
             <p class="control has-icons-left">
-              <input id="settings-mail" class="input is-success"
-                     type="text" placeholder="{{user.mail}}">
+              <input id="devices-code" class="input" type="text"
+                     placeholder="PAIRING_CODE">
               <span class="icon is-small is-left">
-                <i class="fa fa-envelope"></i>
-              </span>
-            </p>
-          </div>
-          <div class="field">
-            <p class="control has-icons-left">
-              <input id="settings-pass" class="input" type="password" placeholder="&#x2022&#x2022&#x2022&#x2022&#x2022">
-              <span class="icon is-small is-left">
-                <i class="fa fa-lock"></i>
+                <i class="fa fa-id-card"></i>
               </span>
             </p>
           </div>
           <br>
-          <a id="save" class="form-button button is-primary is-inverted is-outlined">
-            <span>Save</span>
+          <a id="pair" class="form-button button is-primary is-inverted is-outlined">
+            <span>Pair</span>
           </a>
           <a href="/" class="form-button button is-primary is-inverted is-outlined">
             <span>Exit</span>

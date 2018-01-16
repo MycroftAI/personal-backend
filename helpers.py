@@ -30,6 +30,11 @@ def get_user():
         return user
 
 
+def get_device():
+    username = session['username']
+    return None
+
+
 def add_user(username, password, email):
     with session_scope() as s:
         u = User(name=username, password=password, mail=email)
