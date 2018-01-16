@@ -1,5 +1,5 @@
 {% extends "navbar.html" %}
-{% block content %}    
+{% block content %}
 <title>Personal Mycroft Backend</title>
 <section class="hero is-primary is-bold is-small">
   <div class="hero-body">
@@ -9,6 +9,7 @@
           <h1 class="title">Device Settings</h1>
           <div class="field">
             <p class="control has-icons-left">
+
               <input id="devices-name" class="input is-success" type="text"
                      placeholder="name your device">
               <span class="icon is-small is-left">
@@ -18,7 +19,7 @@
           </div>
           <div class="field">
             <p class="control has-icons-left">
-              <input id="devices-code" class="input" type="text"
+              <input id="devices-code" class="input is-success" type="text"
                      placeholder="PAIRING_CODE">
               <span class="icon is-small is-left">
                 <i class="fa fa-id-card"></i>
@@ -26,11 +27,9 @@
             </p>
           </div>
           <br>
-          <a id="pair" class="form-button button is-primary is-inverted is-outlined">
+          <a id="pair"
+             class="form-button button is-primary is-inverted is-outlined">
             <span>Pair</span>
-          </a>
-          <a href="/" class="form-button button is-primary is-inverted is-outlined">
-            <span>Exit</span>
           </a>
           <br>
           <br>

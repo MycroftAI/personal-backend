@@ -2,12 +2,11 @@ from flask import Flask, redirect, url_for, render_template, request, \
     session, make_response, Response, flash
 from flask_sslify import SSLify
 
-from forms import LoginForm
+from forms import LoginForm, PairingForm
 from database.users import *
 from settings import *
 import helpers
 import json
-import os
 from functools import wraps
 
 from flask_mail import Mail, Message
@@ -155,7 +154,7 @@ def confirm(token):
         email = helpers.confirm_token(token)
     except:
         flash('The confirmation link is invalid or has expired.')
-        return render_template('unconfirmed.html')
+        return redirect(url_for('login'))
 
     user = helpers.get_user()
     if user.mail == email:
@@ -167,7 +166,7 @@ def confirm(token):
     return redirect(url_for('login'))
 
 
-@app.route('/unconfirmed')
+@app.route('/unconfirmed', methods=['GET', 'POST'])
 @noindex
 @donation
 @requires_auth
@@ -179,21 +178,24 @@ def unconfirmed():
     return render_template('unconfirmed.html')
 
 
-@app.route('/resend')
+@app.route('/resend', methods=['GET', 'POST'])
 @noindex
 @donation
 @requires_auth
 def resend():
     user = helpers.get_user()
     if user.confirmed:
+        flash('Already confirmed.')
         return redirect(url_for('login'))
-    token = helpers.generate_confirmation_token(user.mail)
-    confirm_url = url_for('confirm', token=token, _external=True)
-    html = render_template('activate.html', confirm_url=confirm_url)
-    subject = "Please confirm your email"
-    helpers.send_confirmation_mail(user.mail, subject, html)
-    flash('A new confirmation email has been sent.')
-    return redirect(url_for('unconfirmed'))
+    if request.method == 'POST':
+        token = helpers.generate_confirmation_token(user.mail)
+        confirm_url = url_for('confirm', token=token, _external=True)
+        html = render_template('activate.html', confirm_url=confirm_url)
+        subject = "Please confirm your email"
+        helpers.send_confirmation_mail(user.mail, subject, html)
+        flash('A new confirmation email has been sent.')
+        return render_template('resent.html')
+    return render_template('unconfirmed.html')
 
 
 @app.route('/settings', methods=['GET', 'POST'])
@@ -219,25 +221,28 @@ def settings():
 @requires_auth
 @check_confirmed
 def devices():
+    form = PairingForm(request.form)
     if request.method == 'POST':
-        code = request.form['code']
-        print request.form
-        print code
-        name = request.form['name']
-        print name
+        print request.form.keys()
+        if form.validate():
+            code = request.form['code']
 
-        user = helpers.get_user()
-        msg = Message("Device was paired",
-                      recipients=[user.mail])
-        mail.send(msg)
+            print code
+            name = request.form['name']
+            print name
 
-        return json.dumps({'status': 'Paired'})
+            user = helpers.get_user()
+            msg = Message("Device was paired",
+                          recipients=[user.mail])
+            mail.send(msg)
 
-    return render_template('devices.html')
+            return json.dumps({'status': 'Paired'})
+        return json.dumps({'status': 'NOT Paired'})
+
+    return render_template('devices.html', form=form)
 
 
 if __name__ == "__main__":
-    app.secret_key = os.urandom(12)  # Generic key for dev purposes only
     if SSL:
         import ssl
         context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
