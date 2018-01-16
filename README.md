@@ -16,17 +16,24 @@ wait until it is finished
 
 configure backend by editing settings.py
 
+    SECRET_KEY = 'MY_PRECIOUS_SECRET_KEY'
+    SECURITY_PASSWORD_SALT = 'MY_TABLE_SALT'
     API_VERSION = "v0.1"
-    MAIL = "mail to be used by your devices"
-    PASSWORD = "mail password"
     SQL_ADMINS_URI = "sqlite:///database/admins.db"
     SQL_DEVICES_URI = "sqlite:///database/devices.db"
     DEBUG = True
     SSL = False
-    SSL_CERT = "path/to.crt"
-    SSL_KEY = "path/to.key"
+    SSL_CERT = ""
+    SSL_KEY = ""
     BACKEND_PORT = 6712
     WEBSITE_PORT = 5000
+    MAIL_SERVER = 'smtp.googlemail.com'
+    MAIL_PORT = 465
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL = True
+    MAIL_USERNAME = "will.send.from.here@gmail.com"
+    MAIL_PASSWORD = "not a passwd"
+    MAIL_DEFAULT_SENDER = "will.send.from.here@gmail.com"
 
 change url in "server" section in your default mycroft config
 

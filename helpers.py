@@ -5,7 +5,7 @@ from database.users import *
 from itsdangerous import URLSafeTimedSerializer
 from settings import SECURITY_PASSWORD_SALT, SECRET_KEY, MAIL_DEFAULT_SENDER
 from flask_mail import Message
-from website import mail
+from frontend import mail
 
 from smtplib import SMTPRecipientsRefused
 

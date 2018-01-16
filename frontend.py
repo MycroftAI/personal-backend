@@ -209,7 +209,7 @@ def settings():
         if password != "":
             password = helpers.hash_password(password)
         email = request.form['email']
-        helpers.change_user(password=password, email=email)
+        helpers.change_user(password=password, mail=email)
         return json.dumps({'status': 'Saved'})
     user = helpers.get_user()
     return render_template('settings.html', user=user)
