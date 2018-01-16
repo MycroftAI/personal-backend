@@ -12,6 +12,8 @@ from flask_mail import Mail
 
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = SECRET_KEY
+app.config['SECURITY_PASSWORD_SALT'] = SECURITY_PASSWORD_SALT
 sslify = SSLify(app)
 mail = Mail(app)
 

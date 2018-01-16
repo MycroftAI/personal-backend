@@ -1,4 +1,5 @@
-from flask import Flask, redirect, url_for, render_template, request, session, make_response, Response
+from flask import Flask, redirect, url_for, render_template, request, \
+    session, make_response, Response, flash
 from flask_sslify import SSLify
 
 from forms import LoginForm
@@ -14,6 +15,8 @@ from flask_mail import Mail, Message
 
 engine = db_connect()
 app = Flask(__name__)
+app.config["SECRET_KEY"] = SECRET_KEY
+app.config['SECURITY_PASSWORD_SALT'] = SECURITY_PASSWORD_SALT
 app.config["MAIL_SERVER"] = MAIL_SERVER
 app.config["MAIL_PORT"] = MAIL_PORT
 app.config["MAIL_USE_TLS"] = MAIL_USE_TLS
@@ -21,6 +24,7 @@ app.config["MAIL_USE_SSL"] = MAIL_USE_SSL
 app.config["MAIL_USERNAME"] = MAIL_USERNAME
 app.config["MAIL_PASSWORD"] = MAIL_PASSWORD
 app.config["MAIL_DEFAULT_SENDER"] = MAIL_DEFAULT_SENDER
+
 sslify = SSLify(app)
 mail = Mail(app)
 
@@ -61,6 +65,18 @@ def authenticate():
     return redirect(url_for('login'))
 
 
+def check_confirmed(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        user = helpers.get_user()
+        if user.confirmed is False:
+            flash('Please confirm your account!')
+            return redirect(url_for('unconfirmed'))
+        return func(*args, **kwargs)
+
+    return decorated_function
+
+
 def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -88,7 +104,9 @@ def login():
             return json.dumps({'status': 'Both fields required'})
         return render_template('login.html', form=form)
     user = helpers.get_user()
-    return render_template('home.html', user=user)
+    if user.confirmed:
+        return render_template('home.html', user=user)
+    return redirect(url_for('unconfirmed'))
 
 
 @app.route("/logout")
@@ -111,22 +129,78 @@ def signup():
             email = request.form['email']
             if form.validate():
                 if helpers.username_taken(username):
+                    flash("Username taken")
                     return json.dumps({'status': 'Username taken'})
                 if helpers.mail_taken(email):
+                    flash("Email taken")
                     return json.dumps({'status': 'Email taken'})
-                helpers.add_user(username, password, email)
-                session['logged_in'] = True
-                session['username'] = username
-                return json.dumps({'status': 'Signup successful'})
+                if helpers.add_user(username, password, email):
+                    session['logged_in'] = True
+                    session['username'] = username
+                    flash("Signup successful")
+                    return json.dumps({'status': 'Signup successful'})
+                flash("Signup failed")
+                return json.dumps({'status': 'Signup failed'})
+            flash('User/Pass required')
             return json.dumps({'status': 'User/Pass required'})
-        return render_template('login.html', form=form)
+    return redirect(url_for('unconfirmed'))
+
+
+@app.route('/confirm/<token>')
+@noindex
+@donation
+@requires_auth
+def confirm(token):
+    try:
+        email = helpers.confirm_token(token)
+    except:
+        flash('The confirmation link is invalid or has expired.')
+        return render_template('unconfirmed.html')
+
+    user = helpers.get_user()
+    if user.mail == email:
+        if user.confirmed:
+            flash('Account already confirmed. Please login.')
+        else:
+            helpers.change_user(confirmed=True, confirmed_on=time.time())
+            flash('You have confirmed your account. Thanks!')
     return redirect(url_for('login'))
+
+
+@app.route('/unconfirmed')
+@noindex
+@donation
+@requires_auth
+def unconfirmed():
+    user = helpers.get_user()
+    if user.confirmed:
+        return redirect(url_for('login'))
+    flash('Please confirm your account!')
+    return render_template('unconfirmed.html')
+
+
+@app.route('/resend')
+@noindex
+@donation
+@requires_auth
+def resend():
+    user = helpers.get_user()
+    if user.confirmed:
+        return redirect(url_for('login'))
+    token = helpers.generate_confirmation_token(user.mail)
+    confirm_url = url_for('confirm', token=token, _external=True)
+    html = render_template('activate.html', confirm_url=confirm_url)
+    subject = "Please confirm your email"
+    helpers.send_confirmation_mail(user.mail, subject, html)
+    flash('A new confirmation email has been sent.')
+    return redirect(url_for('unconfirmed'))
 
 
 @app.route('/settings', methods=['GET', 'POST'])
 @noindex
 @donation
 @requires_auth
+@check_confirmed
 def settings():
     if request.method == 'POST':
         password = request.form['password']
@@ -143,6 +217,7 @@ def settings():
 @noindex
 @donation
 @requires_auth
+@check_confirmed
 def devices():
     if request.method == 'POST':
         code = request.form['code']

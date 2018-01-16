@@ -20,6 +20,15 @@
   width: 325px;
 }
 
+.devices-box {
+  margin: auto;
+  width: 325px;
+}
+
+.devices-area {
+  padding: 30px;
+}
+
 .signup-area {
   padding: 30px;
 }

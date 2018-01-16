@@ -56,15 +56,20 @@ start your backend by running main.py, start website by running website.py
 
 - patch device settings
 
-- pairing process
+- pairing process ( status: integrating into website, works with dev api)
 
-- store metrics
+- store metrics (status: integrating into flask, sql db and api endpoints functional)
 
 - send mail
 
-- STT using google default key
+- STT using google default key (status: testing )
 
 - sql database
+
+- user email confirmation
+
+- website (status: WIP)
+
 
 
 # remote admin api
@@ -90,6 +95,6 @@ quickly pair a device by
 
 - weather api
 
-- web ui
-
 - everything else
+
+- new functionality, ie, user voice print from uploaded utterances / wakewords

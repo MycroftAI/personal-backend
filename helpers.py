@@ -1,8 +1,13 @@
-from flask import session
+from flask import session, url_for, render_template
 from contextlib import contextmanager
 import bcrypt
 from database.users import *
+from itsdangerous import URLSafeTimedSerializer
+from settings import SECURITY_PASSWORD_SALT, SECRET_KEY, MAIL_DEFAULT_SENDER
+from flask_mail import Message
+from website import mail
 
+from smtplib import SMTPRecipientsRefused
 
 @contextmanager
 def session_scope():
@@ -32,14 +37,29 @@ def get_user():
 
 def get_device():
     username = session['username']
+    # TODO
     return None
 
 
 def add_user(username, password, email):
+    token = generate_confirmation_token(email)
     with session_scope() as s:
-        u = User(name=username, password=password, mail=email)
-        s.add(u)
-        s.commit()
+        try:
+            u = User(name=username, password=password, mail=email, token=token)
+            confirm_url = url_for('confirm', token=token, _external=True)
+            html = render_template('activate.html', confirm_url=confirm_url)
+            subject = "Please confirm your email"
+            send_confirmation_mail(email, subject, html)
+            s.add(u)
+            s.commit()
+            return True
+        except IntegrityError:
+            s.rollback()
+        except SMTPRecipientsRefused:
+            print "invalid email provided"
+        except Exception as e:
+            print e
+    return False
 
 
 def change_user(**kwargs):
@@ -73,3 +93,31 @@ def username_taken(username):
 def mail_taken(email):
     with session_scope() as s:
         return s.query(User).filter(User.mail.in_([email])).first()
+
+
+def generate_confirmation_token(email):
+    serializer = URLSafeTimedSerializer(SECRET_KEY)
+    return serializer.dumps(email, salt=SECURITY_PASSWORD_SALT)
+
+
+def confirm_token(token, expiration=3600):
+    serializer = URLSafeTimedSerializer(SECRET_KEY)
+    try:
+        email = serializer.loads(
+            token,
+            salt=SECURITY_PASSWORD_SALT,
+            max_age=expiration
+        )
+    except:
+        return False
+    return email
+
+
+def send_confirmation_mail(to, subject, template):
+    msg = Message(
+        subject,
+        recipients=[to],
+        html=template,
+        sender=MAIL_DEFAULT_SENDER
+    )
+    mail.send(msg)
