@@ -140,8 +140,8 @@ def signup():
                     return json.dumps({'status': 'Signup successful'})
                 flash("Signup failed")
                 return json.dumps({'status': 'Signup failed'})
-            flash('User/Pass required')
-            return json.dumps({'status': 'User/Pass required'})
+            flash('All fields required')
+            return json.dumps({'status': 'All fields required'})
     return redirect(url_for('unconfirmed'))
 
 
@@ -215,12 +215,12 @@ def settings():
     return render_template('settings.html', user=user)
 
 
-@app.route('/devices', methods=['GET', 'POST'])
+@app.route('/pair', methods=['GET', 'POST'])
 @noindex
 @donation
 @requires_auth
 @check_confirmed
-def devices():
+def pair():
     form = PairingForm(request.form)
     if request.method == 'POST':
         print request.form.keys()

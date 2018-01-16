@@ -59,7 +59,7 @@ $(document).ready(function() {
   $(document).on("click", "#pair", function() {
     $.post({
       type: "POST",
-      url: "/devices",
+      url: "/pair",
       data: {"code": $("#devices-code").val(),
              "name": $("#devices-name").val()},
       success: function(response){
