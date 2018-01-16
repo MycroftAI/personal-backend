@@ -3,16 +3,26 @@ from flask_sslify import SSLify
 
 from forms import LoginForm
 from database.users import *
-from settings import SSL, SSL_CERT, SSL_KEY, DEBUG, WEBSITE_PORT
+from settings import *
 import helpers
 import json
 import os
 from functools import wraps
 
+from flask_mail import Mail, Message
+
 
 engine = db_connect()
 app = Flask(__name__)
+app.config["MAIL_SERVER"] = MAIL_SERVER
+app.config["MAIL_PORT"] = MAIL_PORT
+app.config["MAIL_USE_TLS"] = MAIL_USE_TLS
+app.config["MAIL_USE_SSL"] = MAIL_USE_SSL
+app.config["MAIL_USERNAME"] = MAIL_USERNAME
+app.config["MAIL_PASSWORD"] = MAIL_PASSWORD
+app.config["MAIL_DEFAULT_SENDER"] = MAIL_DEFAULT_SENDER
 sslify = SSLify(app)
+mail = Mail(app)
 
 
 def add_response_headers(headers=None):
@@ -140,6 +150,12 @@ def devices():
         print code
         name = request.form['name']
         print name
+
+        user = helpers.get_user()
+        msg = Message("Device was paired",
+                      recipients=[user.mail])
+        mail.send(msg)
+
         return json.dumps({'status': 'Paired'})
 
     return render_template('devices.html')

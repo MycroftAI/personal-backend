@@ -1,6 +1,4 @@
 API_VERSION = "v0.1"
-MAIL = ""
-PASSWORD = ""
 SQL_ADMINS_URI = "sqlite:///database/admins.db"
 SQL_DEVICES_URI = "sqlite:///database/devices.db"
 DEBUG = True
@@ -9,3 +7,10 @@ SSL_CERT = ""
 SSL_KEY = ""
 BACKEND_PORT = 6712
 WEBSITE_PORT = 5000
+MAIL_SERVER = "127.0.0.1"
+MAIL_PORT = 25
+MAIL_USE_TLS = False
+MAIL_USE_SSL = False
+MAIL_USERNAME = None
+MAIL_PASSWORD = None
+MAIL_DEFAULT_SENDER = None

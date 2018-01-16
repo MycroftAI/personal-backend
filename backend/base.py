@@ -6,12 +6,14 @@ from flask import Flask, make_response, request, Response
 from flask_sslify import SSLify
 from database.admin import AdminDatabase
 from database.devices import DeviceDatabase
-from settings import API_VERSION, MAIL, PASSWORD, SQL_ADMINS_URI, \
-    SQL_DEVICES_URI, SSL_CERT, SSL_KEY, SSL, DEBUG
+from settings import *
+
+from flask_mail import Mail
 
 
 app = Flask(__name__)
 sslify = SSLify(app)
+mail = Mail(app)
 
 # users in middle of pairing
 UNPAIRED_DEVICES = {}

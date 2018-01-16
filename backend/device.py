@@ -1,10 +1,9 @@
 from backend.base import app, noindex, donation, nice_json, \
-    API_VERSION, UNPAIRED_DEVICES, DEVICES, start, requires_auth, MAIL, \
-    PASSWORD
+    API_VERSION, UNPAIRED_DEVICES, DEVICES, start, requires_auth, mail
 from flask import redirect, url_for, request, Response
 from backend.backend_utils import geo_locate, generate_code, location_dict
 from database import gen_api, model_to_dict
-import yagmail
+from flask_mail import Message
 import time
 
 
@@ -193,8 +192,12 @@ def send_mail(uuid=""):
     # sender is meant to id which skill triggered it and is currently ignored
     user = DEVICES.get_user_by_uuid(uuid)
     if user is not None:
-        with yagmail.SMTP(MAIL, PASSWORD) as yag:
-            yag.send(user.mail, data["title"], data["body"])
+        message = data["body"]
+        subject = data["title"]
+        msg = Message(recipients=[user.email],
+                      body=message,
+                      subject=subject)
+        mail.send(msg)
 
 
 @app.route("/" + API_VERSION + "/device/<uuid>/metric/<name>",
