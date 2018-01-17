@@ -117,7 +117,7 @@ def resend():
     if user and user.confirmed:
         flash('Already confirmed.')
         return redirect(url_for('login'))
-    if request.method == 'POST':
+    if request.method == 'POST' and user:
         token = utils.generate_confirmation_token(user.mail)
         confirm_url = url_for('confirm', token=token, _external=True)
         html = render_template('activate.html', confirm_url=confirm_url)

@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from database import Base
 
 import time
-
+from database import props
 
 ## association tables
 
@@ -119,7 +119,7 @@ config_sounds = Table('config_sounds', Base.metadata,
 
 class UnpairedDevice(Base):
     __tablename__ = 'unpaired'
-    created_at = Column(String, default=time.time())
+    created_at = Column(String, default=str(time.time()))
     uuid = Column(String, primary_key=True, nullable=False)
     code = Column(String, nullable=False)
 
@@ -424,13 +424,17 @@ class DeviceDatabase(object):
         if device is None:
             return False
         location_data = location_data or {}
+        location = device.location
+
+        properties = props(Location)
+
         for arg, val in location_data.items():
-            if val:
+            if val and val in properties:
                 try:
-                    setattr(device.location, arg, val)
+                    setattr(location, arg, val)
                     self.session.commit()
                 except Exception as e:
-                    pass
+                    print e
                 except IntegrityError:
                     self.session.rollback()
 
@@ -440,8 +444,9 @@ class DeviceDatabase(object):
         device = self.get_device_by_uuid(uuid)
         if device is None:
             return False
+        properties = props(Configuration)
         for arg, val in config_data.items():
-            if val:
+            if val and val in properties:
                 try:
                     setattr(device.config, arg, val)
                     self.session.commit()
@@ -497,9 +502,7 @@ class DeviceDatabase(object):
         self.session.delete(device)
         return self.commit()
 
-    def add_device(self, uuid, name=None,
-                   expires_at=None,
-                   accessToken=None,
+    def add_device(self, uuid, name=None, expires_at=None, accessToken=None,
                    refreshToken=None, mail=None):
 
         user = self.get_user_by_mail(mail) or self.get_user_by_uuid(uuid)

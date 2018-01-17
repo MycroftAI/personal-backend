@@ -32,9 +32,7 @@ def pair(code, uuid, name, mail):
 @donation
 def token():
     api = request.headers.get('Authorization', '').replace("Bearer ", "")
-    print api
     device = DEVICES.get_device_by_token(api)
-    print device
     if not device:
         return Response(
             'Could not verify your access level for that URL.\n'
