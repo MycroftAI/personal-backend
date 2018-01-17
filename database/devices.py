@@ -297,6 +297,7 @@ class Configuration(Base):
     play_wav_cmdline = Column(String,
                               default="paplay %1 --stream-name=mycroft-voice")
     play_mp3_cmdline = Column(String, default="mpg123 %1")
+
     skills_dir = Column(String, default="~/.mycroft/skills")
     skills_auto_update = Column(Boolean, default=False)
     listener_sample_rate = Column(Integer, default=16000)
@@ -344,12 +345,15 @@ class Sound(Base):
 class STT(Base):
     __tablename__ = "stt_engines"
     id = Column(Integer, primary_key=True, nullable=False)
+    engine_type = Column(String, default="")
     name = Column(String, default="")
     lang = Column(String, default="en-us")
     uri = Column(String, default="")
     token = Column(String, default="")
     username = Column(String, default="")
     password = Column(String, default="")
+    client_key = Column(String, default="")
+    client_id = Column(String, default="")
     config = relationship("Configuration", back_populates="stt",
                           secondary=config_stt, uselist=False)
 
@@ -357,14 +361,18 @@ class STT(Base):
 class TTS(Base):
     __tablename__ = "tts_engines"
     id = Column(Integer, primary_key=True, nullable=False)
+    engine_type = Column(String, default="")
     name = Column(String, default="")
     lang = Column(String, default="en-us")
     uri = Column(String, default="")
     token = Column(String, default="")
     username = Column(String, default="")
     password = Column(String, default="")
+    client_key = Column(String, default="")
+    client_id = Column(String, default="")
     voice = Column(String, default="")
     gender = Column(String, default="male")
+    api_key = Column(String)
 
     config = relationship("Configuration", back_populates="tts",
                           secondary=config_tts, uselist=False)

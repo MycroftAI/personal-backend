@@ -94,20 +94,36 @@ def setting(uuid=""):
                 "sound": word.sound
             }
         stt = device.config.stt
+        creds = {}
+        if stt.engine_type == "token":
+            creds = {"token": stt.token}
+        elif stt.engine_type == "basic":
+            creds = {"username": stt.username, "password": stt.password}
+        elif stt.engine_type == "key":
+            creds = {"client_id": stt.client_id, "client_key": stt.client_key}
+        elif stt.engine_type == "json":
+            creds = {"json": stt.client_id, "client_key": stt.client_key}
+
         result["stt"] = {"module": stt.name,
-                         stt.name: {"uri": stt.uri, "token": stt.token,
-                                    "lang": stt.lang, "username":
-                                        stt.username,
-                                    "password": stt.password}
+                         stt.name: {"uri": stt.uri, "lang": stt.lang,
+                                    "credential": creds}
                          }
 
         tts = device.config.tts
         result["tts"] = {"module": tts.name,
-                         tts.name: {"uri": tts.uri, "token": tts.token,
-                                    "lang": tts.lang, "username":
-                                        tts.username, "password":
-                                        tts.password, "voice": tts.voice,
-                                    "gender": tts.gender}}
+                         tts.name: {"token": tts.token,
+                                    "lang": tts.lang, "voice": tts.voice,
+                                    "gender": tts.gender, "uri": tts.uri}}
+        if tts.engine_type == "token":
+            result["tts"][tts.name].merge({"token": tts.token})
+        elif tts.engine_type == "basic":
+            result["tts"][tts.name].merge({"username": tts.username,
+                                           "password": tts.password})
+        elif tts.engine_type == "key":
+            result["tts"][tts.name].merge({"client_id": tts.client_id,
+                                           "client_key": tts.client_key})
+        elif tts.engine_type == "api":
+            result["tts"][tts.name].merge({"api_key": tts.api_key})
 
         for c in cleans:
             result.pop(c)
