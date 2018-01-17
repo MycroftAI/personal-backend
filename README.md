@@ -77,6 +77,8 @@ start your backend by running main.py, start website by running website.py
 
 - website (status: WIP)
 
+- local browserless GUI if running on same machine
+
 
 
 # remote admin api
