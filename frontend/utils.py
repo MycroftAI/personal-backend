@@ -9,7 +9,7 @@ from contextlib import contextmanager
 import bcrypt
 from smtplib import SMTPRecipientsRefused
 
-from frontend.main import mail
+from frontend import mail
 from settings import SECURITY_PASSWORD_SALT, SECRET_KEY, MAIL_DEFAULT_SENDER
 from database.users import *
 from backend import DEVICES

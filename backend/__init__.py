@@ -20,6 +20,12 @@ ADMINS = AdminDatabase(SQL_ADMINS_URI, debug=DEBUG)
 DEVICES = DeviceDatabase(SQL_DEVICES_URI, debug=DEBUG)
 
 
+from backend.auth import token, pair
+from backend.device import location, setting, get_uuid, code, device, activate, \
+    send_mail, metric, subscription_type, get_subscriber_voice_url
+from backend.main import hello
+from backend.stt import stt
+
 def start_backend(port=BACKEND_PORT):
     if SSL:
         import ssl

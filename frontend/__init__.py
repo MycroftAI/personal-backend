@@ -23,6 +23,9 @@ app.config["MAIL_DEFAULT_SENDER"] = MAIL_DEFAULT_SENDER
 sslify = SSLify(app)
 mail = Mail(app)
 
+from frontend.main import login, logout, signup, confirm, unconfirmed, \
+    resend, settings, pair
+
 
 def start_frontend(port=WEBSITE_PORT):
     if SSL:

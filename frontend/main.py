@@ -1,10 +1,9 @@
-from flask import Flask, redirect, url_for, render_template, request, \
-    session, make_response, flash
-from flask_mail import Mail, Message
+from flask import redirect, url_for, render_template, request, \
+    session, flash
 
 import json
-
-from frontend import app, mail, utils
+import time
+from frontend import app, utils
 from frontend.forms import LoginForm, PairingForm
 from frontend.decorators import noindex, donation, check_confirmed, requires_auth
 
