@@ -19,13 +19,17 @@ from time import sleep
 class DeepSpeechSTT(object):
     def __init__(self):
         self.downloaded = False
+        self.dl = None
         if self.is_ready():
             self.load_model()
         else:
             print("Downloading model")
             self.download()
             while not self.downloaded:
+                if self.dl.done:
+                    raise RuntimeError("Download failed")
                 sleep(1)
+
             if self.is_ready(True):
                 self.load_model()
 
@@ -62,7 +66,7 @@ class DeepSpeechSTT(object):
 
             if not exists(TRIE_PATH):
                 raise AssertionError("language model trie does not exist")
-        except Exception as e:
+        except:
             if is_critical:
                 raise
             return False
@@ -71,7 +75,7 @@ class DeepSpeechSTT(object):
     def download(self):
         print("starting model download")
         target_folder = join(dirname(__file__), "deepspeech")
-        download(MODEL_DOWNLOAD_URL, target_folder, self._extract)
+        self.dl = download(MODEL_DOWNLOAD_URL, target_folder, self._extract)
 
     def _extract(self, target_folder=join(dirname(__file__), "deepspeech")):
         print("model downloaded, extracting files")
