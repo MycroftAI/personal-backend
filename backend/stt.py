@@ -15,10 +15,10 @@ def stt():
     flac_audio = request.data
     lang = request.args["lang"] or "en-us"
 
-    fp = TemporaryFile()
-    fp.write(flac_audio)
-    with AudioFile(fp) as source:
-        audio = recognizer.record(source)  # read the entire audio file
+    with TemporaryFile() as fp:
+        fp.write(flac_audio)
+        with AudioFile(fp) as source:
+            audio = recognizer.record(source)  # read the entire audio file
 
-    utterance = recognizer.recognize_google(audio, language=lang)
+        utterance = recognizer.recognize_google(audio, language=lang)
     return utterance
