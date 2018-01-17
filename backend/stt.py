@@ -3,13 +3,15 @@ from backend.decorators import noindex, donation, requires_auth
 from flask import request
 from tempfile import TemporaryFile
 
+from speech_recognition import Recognizer, AudioFile
+
+recognizer = Recognizer()
+
 if USE_DEEPSPEECH:
     from extra.deepspeech_stt import DeepSpeechSTT
-    stt = DeepSpeechSTT()
-    recognize = stt.recognize
+    engine = DeepSpeechSTT()
+    recognize = engine.recognize
 else:
-    from speech_recognition import Recognizer, AudioFile
-    recognizer = Recognizer()
     recognize = recognizer.recognize_google
 
 
