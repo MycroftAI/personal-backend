@@ -1,9 +1,9 @@
 from flask_mail import Message
-from flask import redirect, url_for, request, Response
+from flask import request, Response
 
 from backend.utils import geo_locate, generate_code, location_dict, \
     nice_json, gen_api
-from backend import app, mail, API_VERSION, UNPAIRED_DEVICES, DEVICES
+from backend import app, mail, API_VERSION, DEVICES
 from backend.decorators import noindex, donation, requires_auth
 from database import model_to_dict
 
@@ -160,7 +160,7 @@ def code():
     uuid = request.args["state"]
     code = generate_code()
     print code
-    UNPAIRED_DEVICES[uuid] = code
+    DEVICES.add_unpaired_device(uuid, code)
     result = {"code": code, "uuid": uuid}
     return nice_json(result)
 
@@ -187,7 +187,7 @@ def activate():
 
     # paired?
     device = DEVICES.get_device_by_uuid(uuid)
-    if device is None:
+    if device is None or not device.paired:
         return Response(
             'Could not verify your access level for that URL.\n'
             'You have to authenticate with proper credentials', 401,
@@ -208,14 +208,14 @@ def activate():
 @requires_auth
 def send_mail(uuid=""):
     data = request.json
-    # sender is meant to id which skill triggered it and is currently ignored
     user = DEVICES.get_user_by_uuid(uuid)
     if user is not None:
         message = data["body"]
         subject = data["title"]
         msg = Message(recipients=[user.email],
                       body=message,
-                      subject=subject)
+                      subject=subject,
+                      sender=data["sender"])
         mail.send(msg)
 
 

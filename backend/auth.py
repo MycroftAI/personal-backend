@@ -15,13 +15,14 @@ import time
 def pair(code, uuid, name, mail):
     # pair
     result = {"paired": False}
-    if uuid in UNPAIRED_DEVICES:
-        # auto - pair ?
-        real_code =UNPAIRED_DEVICES[uuid]
-        if real_code == code:
-            DEVICES.add_user(mail, name)
-            if DEVICES.add_device(uuid, mail=mail):
-                UNPAIRED_DEVICES.pop(uuid)
+    device = DEVICES.get_unpaired_by_uuid(uuid)
+    if device and device.code == code:
+        user = DEVICES.get_user_by_mail(mail)
+        # create user if it doesnt exist
+        if not user:
+            DEVICES.add_user(mail, name, "666")
+        if DEVICES.add_device(uuid, mail=mail):
+            DEVICES.remove_unpaired(uuid)
             result = {"paired": True}
     return nice_json(result)
 
@@ -32,7 +33,7 @@ def pair(code, uuid, name, mail):
 def token():
     api = request.headers.get('Authorization', '').replace("Bearer ", "")
     device = DEVICES.get_device_by_token(api)
-    if device is None:
+    if device is None or not device.paired:
         return Response(
             'Could not verify your access level for that URL.\n'
             'You have to authenticate with proper credentials', 401,

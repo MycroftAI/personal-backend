@@ -16,11 +16,6 @@ app.config['SECURITY_PASSWORD_SALT'] = SECURITY_PASSWORD_SALT
 sslify = SSLify(app)
 mail = Mail(app)
 
-# users in middle of pairing
-UNPAIRED_DEVICES = {}
-ENTERED_CODES = {}
-
-
 ADMINS = AdminDatabase(SQL_ADMINS_URI, debug=DEBUG)
 DEVICES = DeviceDatabase(SQL_DEVICES_URI, debug=DEBUG)
 

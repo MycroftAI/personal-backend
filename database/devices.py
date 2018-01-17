@@ -117,6 +117,13 @@ config_sounds = Table('config_sounds', Base.metadata,
 # classes
 
 
+class UnpairedDevice(Base):
+    __tablename__ = 'unpaired'
+    created_at = Column(String, default=time.time())
+    uuid = Column(String, primary_key=True, nullable=False)
+    code = Column(String, nullable=False)
+
+
 class User(Base):
     __tablename__ = 'users'
 
@@ -124,7 +131,7 @@ class User(Base):
     created_at = Column(String, default=time.time())
     password = Column(Text)
     confirmed = Column(Boolean, nullable=False, default=False)
-    confirmed_on = Column(Integer, nullable=True)
+    confirmed_on = Column(Integer)
     token = Column(String)
     name = Column(String, default="unknown_user", unique=True)
     mail = Column(String, nullable=False, unique=True)
@@ -466,6 +473,24 @@ class DeviceDatabase(object):
                 user.name = name
             if password:
                 user.password = password
+        return self.commit()
+
+    def add_unpaired_device(self, uuid, code):
+        device = UnpairedDevice(uuid=uuid, code=code)
+        self.session.add(device)
+        return self.commit()
+
+    def get_unpaired_by_code(self, code):
+        return self.session.query(UnpairedDevice.code).filter(
+            UnpairedDevice.code == code).first()
+
+    def get_unpaired_by_uuid(self, uuid):
+        return self.session.query(UnpairedDevice.code).filter(
+            UnpairedDevice.uuid == uuid).first()
+
+    def remove_unpaired(self, uuid):
+        device = self.get_unpaired_by_uuid(uuid)
+        self.session.delete(device)
         return self.commit()
 
     def add_device(self, uuid, name=None,
