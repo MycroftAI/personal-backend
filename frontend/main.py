@@ -1,11 +1,18 @@
 from flask import redirect, url_for, render_template, request, \
-    session, flash
+    session, flash, send_from_directory
 
 import json
 import time
+from os.path import join
 from frontend import app, utils
 from frontend.forms import LoginForm, PairingForm
 from frontend.decorators import noindex, donation, check_confirmed, requires_auth
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 @app.route('/', methods=['GET', 'POST'])
