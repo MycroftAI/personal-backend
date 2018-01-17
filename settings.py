@@ -16,3 +16,4 @@ MAIL_USE_SSL = True
 MAIL_USERNAME = "mail@gmail.com"
 MAIL_PASSWORD = "passwd"
 MAIL_DEFAULT_SENDER = "mail@gmail.com"
+USE_DEEPSPEECH = False

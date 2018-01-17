@@ -1,10 +1,16 @@
-from backend import app, API_VERSION
+from backend import app, API_VERSION, USE_DEEPSPEECH
 from backend.decorators import noindex, donation, requires_auth
 from flask import request
 from tempfile import TemporaryFile
-from speech_recognition import Recognizer, AudioFile
 
-recognizer = Recognizer()
+if USE_DEEPSPEECH:
+    from extra.deepspeech_stt import DeepSpeechSTT
+    stt = DeepSpeechSTT()
+    recognize = stt.recognize
+else:
+    from speech_recognition import Recognizer, AudioFile
+    recognizer = Recognizer()
+    recognize = recognizer.recognize_google
 
 
 @app.route("/"+API_VERSION+"/stt", methods=['POST'])
@@ -20,5 +26,5 @@ def stt():
         with AudioFile(fp) as source:
             audio = recognizer.record(source)  # read the entire audio file
 
-        utterance = recognizer.recognize_google(audio, language=lang)
+        utterance = recognize(audio, language=lang)
     return utterance

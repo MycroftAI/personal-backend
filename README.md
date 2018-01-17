@@ -69,7 +69,7 @@ start your backend by running main.py, start website by running website.py
 
 - send mail
 
-- STT using google default key (status: testing )
+- STT using deepspeech or google (status: testing )
 
 - sql database
 
