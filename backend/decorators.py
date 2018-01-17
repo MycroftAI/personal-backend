@@ -1,6 +1,6 @@
 import time
 from functools import wraps
-from flask import Flask, make_response, request, Response
+from flask import make_response, request, Response
 from backend import DEVICES, ADMINS
 
 

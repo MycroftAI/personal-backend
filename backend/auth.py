@@ -1,4 +1,4 @@
-from backend import app, API_VERSION, UNPAIRED_DEVICES, DEVICES
+from backend import app, API_VERSION, DEVICES
 from backend.utils import nice_json, gen_api
 from backend.decorators import noindex, donation, requires_admin
 from database import model_to_dict
