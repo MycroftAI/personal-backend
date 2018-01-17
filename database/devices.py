@@ -412,10 +412,12 @@ class DeviceDatabase(object):
         return self.session.query(Device).filter(Device.uuid == uuid).first()
 
     def get_device_by_token(self, token):
-        return self.session.query(Device).filter(Device.accessToken ==
-                                                 token).first() or \
-               self.session.query(Device).filter(Device.refreshToken ==
+        device = self.session.query(Device).filter(Device.accessToken ==
+                                                   token).first()
+        if not device:
+            device = self.session.query(Device).filter(Device.refreshToken ==
                                                  token).first()
+        return device
 
     def add_location(self, uuid, location_data=None):
         device = self.get_device_by_uuid(uuid)
@@ -454,10 +456,8 @@ class DeviceDatabase(object):
         device = self.get_device_by_uuid(uuid)
         if device is None:
             return False
-        if ip not in [ip.ip_address for ip in device.ips]:
+        if ip not in [IP.ip_address for IP in device.ips]:
             device.ips.append(IPAddress(ip_address=ip))
-        if ip not in [ip.ip_address for ip in device.user.ips]:
-            device.user.ips.append(ip)
         return self.commit()
 
     def add_user(self, mail=None, name="", password=""):
@@ -477,15 +477,19 @@ class DeviceDatabase(object):
 
     def add_unpaired_device(self, uuid, code):
         device = UnpairedDevice(uuid=uuid, code=code)
-        self.session.add(device)
+        try:
+            self.session.add(device)
+        except Exception as e:
+            print "ERROR PAIRING DEVICE", e
+            return False
         return self.commit()
 
     def get_unpaired_by_code(self, code):
-        return self.session.query(UnpairedDevice.code).filter(
+        return self.session.query(UnpairedDevice).filter(
             UnpairedDevice.code == code).first()
 
     def get_unpaired_by_uuid(self, uuid):
-        return self.session.query(UnpairedDevice.code).filter(
+        return self.session.query(UnpairedDevice).filter(
             UnpairedDevice.uuid == uuid).first()
 
     def remove_unpaired(self, uuid):

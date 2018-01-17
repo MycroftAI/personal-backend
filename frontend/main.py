@@ -33,7 +33,7 @@ def login():
             return json.dumps({'status': 'Both fields required'})
         return render_template('login.html', form=form)
     user = utils.get_user()
-    if user.confirmed:
+    if user and user and user.confirmed:
         return render_template('home.html', user=user)
     return redirect(url_for('unconfirmed'))
 
@@ -87,7 +87,7 @@ def confirm(token):
         return redirect(url_for('login'))
 
     user = utils.get_user()
-    if user.mail == email:
+    if user and user.mail == email:
         if user.confirmed:
             flash('Account already confirmed. Please login.')
         else:
@@ -102,7 +102,7 @@ def confirm(token):
 @requires_auth
 def unconfirmed():
     user = utils.get_user()
-    if user.confirmed:
+    if user and user.confirmed:
         return redirect(url_for('login'))
     flash('Please confirm your account!')
     return render_template('unconfirmed.html')
@@ -114,7 +114,7 @@ def unconfirmed():
 @requires_auth
 def resend():
     user = utils.get_user()
-    if user.confirmed:
+    if user and user.confirmed:
         flash('Already confirmed.')
         return redirect(url_for('login'))
     if request.method == 'POST':

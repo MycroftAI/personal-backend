@@ -32,25 +32,25 @@ def pair(code, uuid, name, mail):
 @donation
 def token():
     api = request.headers.get('Authorization', '').replace("Bearer ", "")
+    print api
     device = DEVICES.get_device_by_token(api)
-    if device is None or not device.paired:
+    print device
+    if not device:
         return Response(
             'Could not verify your access level for that URL.\n'
             'You have to authenticate with proper credentials', 401,
             {'WWW-Authenticate': 'Basic realm="NOT PAIRED"'})
-
     # token to refresh expired token
     if device.refreshToken is None or device.refreshToken != api:
         return Response(
             'Could not verify your access level for that URL.\n'
             'You have to authenticate with proper credentials', 401,
             {'WWW-Authenticate': 'Basic realm="BAD REFRESH CODE"'})
-
     # new tokens to access
     access_token = gen_api()
     new_refresh_token = gen_api()
 
-    DEVICES.add_device(device.uuid, expires_at=time.time() + 72000,
+    DEVICES.add_device(uuid=device.uuid, expires_at=time.time() + 72000,
                        accessToken=access_token,
                        refreshToken=new_refresh_token)
 
