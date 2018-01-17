@@ -47,7 +47,7 @@ change url in "server" section in your default mycroft config
       },
 
 
-start your backend by running main.py, start website by running website.py
+start your backend by running start_backend.py, start website by running start_frontend.py
 
 
 # Features
@@ -63,13 +63,13 @@ start your backend by running main.py, start website by running website.py
 
 - patch device settings
 
-- pairing process ( status: integrating into website, works with dev api)
+- pairing process
 
-- store metrics (status: integrating into flask, sql db and api endpoints functional)
+- store metrics (integrating into frontend, sql db and api endpoints functional)
 
 - send mail
 
-- STT using deepspeech or google (status: testing )
+- STT using deepspeech or google (testing )
 
 - sql database
 
@@ -77,7 +77,7 @@ start your backend by running main.py, start website by running website.py
 
 - website (status: WIP)
 
-- local browserless GUI if running on same machine
+- local browserless GUI if running on same machine (testing)
 
 
 
@@ -102,10 +102,14 @@ quickly pair a device by
 
 - skill settings
 
+- wakeword upload
+
 - wolfram alpha api
 
 - weather api
 
 - everything else i forgot
 
-- new functionality, ie, user voice print from uploaded utterances / wakewords
+- new functionality
+    - user voice print from uploaded utterances / wakewords
+    - train snowboy models
