@@ -98,12 +98,14 @@ quickly pair a device by
 
 # TODOS
 
+- STT json settings in db (for google cloud stt engine)
+
 - skill settings
 
 - wolfram alpha api
 
 - weather api
 
-- everything else
+- everything else i forgot
 
 - new functionality, ie, user voice print from uploaded utterances / wakewords
