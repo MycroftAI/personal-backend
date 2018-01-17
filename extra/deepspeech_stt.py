@@ -69,15 +69,15 @@ class DeepSpeechSTT(object):
         return True
 
     def download(self):
-        print "starting model download"
+        print("starting model download")
         target_folder = join(dirname(__file__), "deepspeech")
         download(MODEL_DOWNLOAD_URL, target_folder, self._extract)
 
     def _extract(self, target_folder=join(dirname(__file__), "deepspeech")):
-        print "model downloaded, extracting files"
+        print("model downloaded, extracting files")
         untar(join(target_folder, MODEL_DOWNLOAD_URL.split("/")[-1]),
               target_folder, True)
-        print "model ready"
+        print("model ready")
         self.downloaded = True
 
     def recognize(self, audio, language="en-us"):
