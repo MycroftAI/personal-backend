@@ -1,13 +1,18 @@
 from flask import session, url_for, render_template
+from flask_mail import Message
+
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
+
+from itsdangerous import URLSafeTimedSerializer
 from contextlib import contextmanager
 import bcrypt
-from database.users import *
-from itsdangerous import URLSafeTimedSerializer
-from settings import SECURITY_PASSWORD_SALT, SECRET_KEY, MAIL_DEFAULT_SENDER
-from flask_mail import Message
-from frontend import mail
-
 from smtplib import SMTPRecipientsRefused
+
+from frontend.main import mail
+from settings import SECURITY_PASSWORD_SALT, SECRET_KEY, MAIL_DEFAULT_SENDER
+from database.users import *
+
 
 @contextmanager
 def session_scope():

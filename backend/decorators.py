@@ -1,29 +1,7 @@
-import ssl
 import time
 from functools import wraps
-from backend.backend_utils import root_dir, nice_json
 from flask import Flask, make_response, request, Response
-from flask_sslify import SSLify
-from database.admin import AdminDatabase
-from database.devices import DeviceDatabase
-from settings import *
-
-from flask_mail import Mail
-
-
-app = Flask(__name__)
-app.config["SECRET_KEY"] = SECRET_KEY
-app.config['SECURITY_PASSWORD_SALT'] = SECURITY_PASSWORD_SALT
-sslify = SSLify(app)
-mail = Mail(app)
-
-# users in middle of pairing
-UNPAIRED_DEVICES = {}
-ENTERED_CODES = {}
-
-
-ADMINS = AdminDatabase(SQL_ADMINS_URI, debug=DEBUG)
-DEVICES = DeviceDatabase(SQL_DEVICES_URI, debug=DEBUG)
+from backend import DEVICES, ADMINS
 
 
 def add_response_headers(headers=None):
@@ -105,31 +83,3 @@ def requires_admin(f):
         return f(*args, **kwargs)
 
     return decorated
-
-
-@app.route("/", methods=['GET'])
-@noindex
-@donation
-def hello():
-    return nice_json({
-        "uri": "/",
-        "welcome to Personal Mycroft Backend": {
-            "author": "JarbasAI"
-        }
-    })
-
-
-def start(app, port=6666):
-    if SSL:
-        cert = SSL_CERT
-        key = SSL_KEY
-        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-        context.load_cert_chain(cert, key)
-        app.run(host="0.0.0.0", port=port, debug=DEBUG, ssl_context=context)
-    else:
-        app.run(host="0.0.0.0", port=port, debug=DEBUG)
-
-
-if __name__ == "__main__":
-    port = 5678
-    start(app, port)

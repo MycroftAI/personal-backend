@@ -1,10 +1,7 @@
 from sqlalchemy import Column, Text, String, Integer, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.declarative import declarative_base
-
-
-Base = declarative_base()
+from database import Base
 
 
 class Admin(Base):

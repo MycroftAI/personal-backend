@@ -1,8 +1,10 @@
-from backend.base import app, noindex, donation, requires_admin, nice_json, \
-    API_VERSION, UNPAIRED_DEVICES, DEVICES, start
+from backend import app, API_VERSION, UNPAIRED_DEVICES, DEVICES
+from backend.utils import nice_json, gen_api
+from backend.decorators import noindex, donation, requires_admin
+from database import model_to_dict
+
 from flask import request, Response
 import time
-from database import gen_api, model_to_dict
 
 
 @app.route("/" + API_VERSION + "/pair/<code>/<uuid>/<name>/<mail>",
@@ -52,9 +54,3 @@ def token():
                        refreshToken=new_refresh_token)
 
     return nice_json(model_to_dict(device))
-
-
-if __name__ == "__main__":
-    global app
-    port = 6712
-    start(app, port)

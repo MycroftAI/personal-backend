@@ -1,9 +1,57 @@
-import pygeoip
-import os
-import json
 from flask import make_response
+
 import requests
 import random
+import base64
+import pygeoip
+import json
+from os import makedirs, urandom
+from os.path import exists, join, dirname
+
+
+def gen_api(user="demo_user", save=False):
+    k = urandom(32)
+    k = base64.urlsafe_b64encode(k)
+    k = "JARBAS_"+str(k)
+    if not exists(join(dirname(__file__), "database")):
+        makedirs(join(dirname(__file__), "database"))
+    if not exists(join(dirname(__file__), "database", "users.json")):
+        users = {}
+    else:
+        with open(join(dirname(__file__), "database", "users.json"), "r") as f:
+            users = json.load(f)
+    while k in users.keys():
+        k = gen_api(user)
+    k = k[:-1]
+    if save:
+        users[k] = {"id": str(len(users)), "last_active": 0, "name": user}
+        with open(join(dirname(__file__), "database", "users.json"), "w") as f:
+            data = json.dumps(users)
+            f.write(data)
+    return k
+
+
+def gen_admin_api(user="admin", save=True):
+    k = urandom(32)
+    k = base64.urlsafe_b64encode(k)
+    k = "JARBAS_"+str(k)
+    if not exists(join(dirname(__file__), "database")):
+        makedirs(join(dirname(__file__), "database"))
+    if not exists(join(dirname(__file__), "database", "admins.json")):
+        users = {}
+    else:
+        with open(join(dirname(__file__), "database", "admins.json"),
+                  "r") as f:
+            users = json.load(f)
+    while k in users.keys():
+        k = gen_api(user)
+    k = k[:-1]
+    if save:
+        users[k] = {"id": user, "last_active": 0, "name": user}
+        with open(join(dirname(__file__), "database", "admins.json"), "w") as f:
+            data = json.dumps(users)
+            f.write(data)
+    return k
 
 
 def generate_code():
@@ -18,7 +66,7 @@ def generate_code():
 
 def root_dir():
     """ Returns root directory for this project """
-    return os.path.dirname(os.path.realpath(__file__ + '/.'))
+    return dirname(dirname(__file__))
 
 
 def nice_json(arg):
@@ -32,7 +80,8 @@ def geo_locate(ip):
         response = requests.get("https://ipapi.co/json/")
         data = response.json()
     else:
-        g = pygeoip.GeoIP('GeoLiteCity.dat')
+        g = pygeoip.GeoIP(join(root_dir(), 'database',
+                                       'GeoLiteCity.dat'))
         data = g.record_by_addr(ip) or {}
 
     city = data.get("city")

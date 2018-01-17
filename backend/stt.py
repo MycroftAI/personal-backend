@@ -1,4 +1,5 @@
-from backend.base import app, noindex, donation, requires_auth, start, API_VERSION
+from backend import app, API_VERSION
+from backend.decorators import noindex, donation, requires_auth
 from flask import redirect, url_for, request, Response
 
 from speech_recognition import Recognizer, AudioFile
@@ -21,9 +22,3 @@ def stt():
 
     utterance = recognizer.recognize_google(audio, language=lang)
     return utterance
-
-
-if __name__ == "__main__":
-    global app
-    port = 6712
-    start(app, port)

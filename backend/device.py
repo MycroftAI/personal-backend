@@ -1,9 +1,12 @@
-from backend.base import app, noindex, donation, nice_json, \
-    API_VERSION, UNPAIRED_DEVICES, DEVICES, start, requires_auth, mail
-from flask import redirect, url_for, request, Response
-from backend.backend_utils import geo_locate, generate_code, location_dict
-from database import gen_api, model_to_dict
 from flask_mail import Message
+from flask import redirect, url_for, request, Response
+
+from backend.utils import geo_locate, generate_code, location_dict, \
+    nice_json, gen_api
+from backend import app, mail, API_VERSION, UNPAIRED_DEVICES, DEVICES
+from backend.decorators import noindex, donation, requires_auth
+from database import model_to_dict
+
 import time
 
 
@@ -239,8 +242,3 @@ def get_subscriber_voice_url(uuid=""):
         DEVICES.commit()
     return nice_json({"link": ""})
 
-
-if __name__ == "__main__":
-    global app
-    port = 6712
-    start(app, port)

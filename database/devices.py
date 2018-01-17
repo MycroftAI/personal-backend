@@ -1,15 +1,11 @@
-import time
-
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Text, \
     Table, Float, create_engine
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.exc import IntegrityError
 
-from sqlalchemy.ext.declarative import declarative_base
+from database import Base
 
-Base = declarative_base()
-
-#from database.magic import MagicBase as Base
+import time
 
 
 ## association tables
