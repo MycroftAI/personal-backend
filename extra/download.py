@@ -133,7 +133,7 @@ def download(url, dest, complete_action=None, header=None):
 def untar(file_path, dest, remove=False):
     if not exists(file_path):
         raise AssertionError("file does not exist")
-    if not file_path.endswith(".tar.gz") or file_path.endswith(".tar.bz2"):
+    if not file_path.endswith(".tar.gz") or not file_path.endswith(".tar.bz2"):
         raise AssertionError("invalid file format")
     with tarfile.open(file_path) as tar:
         tar.extractall(dest)
