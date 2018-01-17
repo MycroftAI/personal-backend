@@ -1,6 +1,6 @@
 from database import Base
 from sqlalchemy import create_engine
-from database.devices import User
+from database.devices import User, UnpairedDevice
 from settings import SQL_DEVICES_URI
 
 

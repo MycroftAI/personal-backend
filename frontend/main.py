@@ -147,21 +147,11 @@ def settings():
 def pair():
     form = PairingForm(request.form)
     if request.method == 'POST':
-        print request.form.keys()
+        status = "NOT Paired"
         if form.validate():
             code = request.form['code']
-
-            print code
-            name = request.form['name']
-            print name
-
-            user = utils.get_user()
-            msg = Message("Device was paired",
-                          recipients=[user.mail])
-            mail.send(msg)
-
-            return json.dumps({'status': 'Paired'})
-        return json.dumps({'status': 'NOT Paired'})
-
+            if utils.pair(code):
+                status = "Paired"
+        return json.dumps({'status': status})
     return render_template('devices.html', form=form)
 

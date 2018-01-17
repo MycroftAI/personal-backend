@@ -12,6 +12,7 @@ from smtplib import SMTPRecipientsRefused
 from frontend.main import mail
 from settings import SECURITY_PASSWORD_SALT, SECRET_KEY, MAIL_DEFAULT_SENDER
 from database.users import *
+from backend import DEVICES
 
 
 @contextmanager
@@ -103,6 +104,19 @@ def mail_taken(email):
 def generate_confirmation_token(email):
     serializer = URLSafeTimedSerializer(SECRET_KEY)
     return serializer.dumps(email, salt=SECURITY_PASSWORD_SALT)
+
+
+def pair(code):
+    device = DEVICES.get_unpaired_by_code(code)
+    if device:
+        user = get_user()
+        if DEVICES.add_device(uuid=device.uuid, mail=user.mail):
+            DEVICES.remove_unpaired(device.uuid)
+            msg = Message("Device was paired",
+                          recipients=[user.mail])
+            mail.send(msg)
+            return True
+    return False
 
 
 def confirm_token(token, expiration=3600):
