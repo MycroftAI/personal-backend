@@ -64,7 +64,7 @@ class DeepSpeechSTT(object):
                 raise AssertionError("language model trie does not exist")
         except Exception as e:
             if is_critical:
-                return
+                raise
             return False
         return True
 
