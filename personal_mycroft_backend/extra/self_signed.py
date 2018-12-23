@@ -29,7 +29,7 @@ def create_self_signed_cert(cert_dir, name="mycroft"):
         cert.get_subject().ST = "Europe"
         cert.get_subject().L = "Mountains"
         cert.get_subject().O = "Jarbas AI"
-        cert.get_subject().OU = "Powered by Mycroft-Core"
+        cert.get_subject().OU = "Mycroft is <3"
         cert.get_subject().CN = gethostname()
         cert.set_serial_number(random.randint(0, 2000))
         cert.gmtime_adj_notBefore(0)
@@ -39,9 +39,9 @@ def create_self_signed_cert(cert_dir, name="mycroft"):
         cert.sign(k, 'sha1')
         if not exists(cert_dir):
             makedirs(cert_dir)
-        open(cert_path, "wt").write(
+        open(cert_path, "wb").write(
             crypto.dump_certificate(crypto.FILETYPE_PEM, cert))
-        open(join(cert_dir, KEY_FILE), "wt").write(
+        open(join(cert_dir, KEY_FILE), "wb").write(
             crypto.dump_privatekey(crypto.FILETYPE_PEM, k))
 
     return cert_path, key_path
