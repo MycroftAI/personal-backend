@@ -3,8 +3,8 @@ from flask import Flask, redirect, url_for, render_template, request, \
 from flask_mail import Mail, Message
 from flask_sslify import SSLify
 
-from settings import *
-from database.users import db_connect
+from personal_mycroft_backend.settings import *
+from personal_mycroft_backend.database.users import db_connect
 
 __author__ = "JarbasAI"
 
@@ -23,8 +23,8 @@ app.config["MAIL_DEFAULT_SENDER"] = MAIL_DEFAULT_SENDER
 sslify = SSLify(app)
 mail = Mail(app)
 
-from frontend.main import login, logout, signup, confirm, unconfirmed, \
-    resend, settings, pair
+from personal_mycroft_backend.frontend.main import login, logout, signup, \
+    confirm, unconfirmed, resend, settings, pair
 
 
 def start_frontend(port=WEBSITE_PORT):
@@ -33,9 +33,10 @@ def start_frontend(port=WEBSITE_PORT):
         context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
         context.load_cert_chain(SSL_CERT, SSL_KEY)
         app.run(debug=DEBUG, port=port, ssl_context=context,
-                use_reloader=True)
+                use_reloader=True, host="0.0.0.0")
     else:
-        app.run(debug=DEBUG, port=port, use_reloader=True)
+        app.run(debug=DEBUG, port=port, use_reloader=True, host="0.0.0.0")
+
 
 if __name__ == "__main__":
     start_frontend()

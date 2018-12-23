@@ -32,9 +32,9 @@ def start_backend(port=BACKEND_PORT):
         context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
         context.load_cert_chain(SSL_CERT, SSL_KEY)
         app.run(debug=DEBUG, port=port, ssl_context=context,
-                use_reloader=True)
+                use_reloader=True, host="0.0.0.0")
     else:
-        app.run(debug=DEBUG, port=port, use_reloader=True)
+        app.run(debug=DEBUG, port=port, use_reloader=True, host="0.0.0.0")
 
 
 if __name__ == "__main__":
