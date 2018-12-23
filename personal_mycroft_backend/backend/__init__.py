@@ -1,6 +1,5 @@
 from flask import Flask, make_response, request, Response
 from flask_mail import Mail
-from flask_sslify import SSLify
 
 from personal_mycroft_backend.backend.utils import nice_json
 from personal_mycroft_backend.database.admin import AdminDatabase
@@ -12,7 +11,7 @@ __author__ = "JarbasAI"
 app = Flask(__name__)
 app.config["SECRET_KEY"] = SECRET_KEY
 app.config['SECURITY_PASSWORD_SALT'] = SECURITY_PASSWORD_SALT
-sslify = SSLify(app)
+
 mail = Mail(app)
 
 ADMINS = AdminDatabase(SQL_ADMINS_URI, debug=DEBUG)
@@ -29,7 +28,10 @@ from personal_mycroft_backend.backend.stt import stt
 def start_backend(port=BACKEND_PORT):
     if SSL:
         import ssl
-        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+
+        from flask_sslify import SSLify
+        sslify = SSLify(app)
+        context = ssl.SSLContext(ssl.PROTOCOL_SSLv3)
         context.load_cert_chain(SSL_CERT, SSL_KEY)
         app.run(debug=DEBUG, port=port, ssl_context=context,
                 use_reloader=True, host="0.0.0.0")

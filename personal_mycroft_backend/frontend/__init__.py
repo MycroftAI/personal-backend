@@ -1,7 +1,6 @@
 from flask import Flask, redirect, url_for, render_template, request, \
     session, make_response, flash
 from flask_mail import Mail, Message
-from flask_sslify import SSLify
 
 from personal_mycroft_backend.settings import *
 from personal_mycroft_backend.database.users import db_connect
@@ -20,7 +19,7 @@ app.config["MAIL_USERNAME"] = MAIL_USERNAME
 app.config["MAIL_PASSWORD"] = MAIL_PASSWORD
 app.config["MAIL_DEFAULT_SENDER"] = MAIL_DEFAULT_SENDER
 
-sslify = SSLify(app)
+
 mail = Mail(app)
 
 from personal_mycroft_backend.frontend.main import login, logout, signup, \
@@ -30,6 +29,8 @@ from personal_mycroft_backend.frontend.main import login, logout, signup, \
 def start_frontend(port=WEBSITE_PORT):
     if SSL:
         import ssl
+        from flask_sslify import SSLify
+        sslify = SSLify(app)
         context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
         context.load_cert_chain(SSL_CERT, SSL_KEY)
         app.run(debug=DEBUG, port=port, ssl_context=context,

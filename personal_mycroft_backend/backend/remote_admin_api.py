@@ -5,7 +5,7 @@ from personal_mycroft_backend.settings import DEBUG
 
 
 class BackendMycroftAPI(object):
-    def __init__(self, api, lang="en-us", url="https://0.0.0.0:6712/v0.1/",
+    def __init__(self, api, lang="en-us", url="http://0.0.0.0:6712/v0.1/",
                  debug=DEBUG):
 
         if debug:
@@ -16,7 +16,7 @@ class BackendMycroftAPI(object):
             requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
         self.api = api
-        self.headers = {"Authorization": str(self.api)}
+        self.headers = {"Authorization": self.api.encode("utf-8")}
         self.lang = lang
         self.url = url
         self.timeout = 10
