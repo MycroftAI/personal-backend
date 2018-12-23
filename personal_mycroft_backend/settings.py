@@ -25,7 +25,7 @@ SQL_DEVICES_URI = conf.get("devices_db",
                            'sqlite:///' + join(DATA_PATH, 'devices.db'))
 
 # SSL
-SSL = conf.get("ssl", True)
+SSL = conf.get("ssl", False)
 SSL_CERT = conf.get("ssl_cert")
 SSL_KEY = conf.get("ssl_key")
 if not SSL_CERT or not SSL_KEY:
@@ -55,6 +55,7 @@ def create_conf_file():
         "website_port": WEBSITE_PORT,
         "secret_key": SECRET_KEY,
         "salt": SECURITY_PASSWORD_SALT,
+        "ssl": SSL,
         "ssl_cert": SSL_CERT,
         "ssl_key": SSL_KEY,
         "mail_user": MAIL_USERNAME,
