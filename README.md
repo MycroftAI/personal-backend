@@ -13,12 +13,16 @@ Pull Requests welcome
 
 ## Install
 
+from source
 
     git clone https://github.com/JarbasAl/personal-mycroft-backend
     cd personal-mycroft-backend
     pip install .
 
+from pip
 
+    pip install personal-mycroft-backend
+    
 configure backend by editing/creating ~/.mycroft/personal_backend/personal_backend.conf
 
     {
