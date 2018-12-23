@@ -3,15 +3,18 @@ from requests.exceptions import ConnectionError
 
 from personal_mycroft_backend.settings import DEBUG
 
-if DEBUG:
-    # filter warnings, TODO this should be removed once we stop using self signed certs
-    from requests.packages.urllib3.exceptions import InsecureRequestWarning
-
-    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-
 
 class BackendMycroftAPI(object):
-    def __init__(self, api, lang="en-us", url="https://0.0.0.0:6712/v0.1/"):
+    def __init__(self, api, lang="en-us", url="https://0.0.0.0:6712/v0.1/",
+                 debug=DEBUG):
+
+        if debug:
+            # filter warnings, TODO this should be removed once we stop using self signed certs
+            from requests.packages.urllib3.exceptions import \
+                InsecureRequestWarning
+
+            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
         self.api = api
         self.headers = {"Authorization": str(self.api)}
         self.lang = lang
