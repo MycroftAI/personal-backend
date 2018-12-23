@@ -386,7 +386,13 @@ class TTS(Base):
 
 
 class DeviceDatabase(object):
-    def __init__(self, path='sqlite:///mycroft.db', debug=False):
+    def __init__(self, path=None, debug=False):
+        if path is None:
+            path = join(expanduser("~"), ".mycroft", "personal_backend")
+            if not exists(path):
+                makedirs(path)
+            path = 'sqlite:///' + join(path, 'devices.db')
+
         self.db = create_engine(path)
         self.db.echo = debug
         Session = sessionmaker(bind=self.db)
