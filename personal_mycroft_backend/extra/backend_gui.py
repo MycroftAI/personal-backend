@@ -2,9 +2,16 @@ try:
     import webview
 except ImportError:
     print("ERROR: run pip install pywebview")
+    try:
+        import gi
+    except ImportError:
+        print("ERROR: run pip install pygobject")
+        print("WARNING - needed system packages: sudo apt install "
+              "python3-pyqt5 python3-pyqt5.qtwebkit libqt5webkit5-dev "
+              "libgirepository1.0-dev")
     raise
 
-from settings import SSL, WEBSITE_PORT
+from personal_mycroft_backend.settings import SSL, WEBSITE_PORT
 from os.path import join
 
 
