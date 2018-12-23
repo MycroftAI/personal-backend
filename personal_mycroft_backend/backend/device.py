@@ -1,11 +1,11 @@
 from flask_mail import Message
 from flask import request, Response
 
-from backend.utils import geo_locate, generate_code, location_dict, \
+from personal_mycroft_backend.backend.utils import geo_locate, generate_code, location_dict, \
     nice_json, gen_api
-from backend import app, mail, API_VERSION, DEVICES
-from backend.decorators import noindex, donation, requires_auth
-from database import model_to_dict
+from personal_mycroft_backend.backend import app, mail, API_VERSION, DEVICES
+from personal_mycroft_backend.backend.decorators import noindex, donation, requires_auth
+from personal_mycroft_backend.database import model_to_dict
 
 import time
 
@@ -159,7 +159,7 @@ def get_uuid(uuid):
 def code():
     uuid = request.args["state"]
     code = generate_code()
-    print code
+    print(code)
     DEVICES.add_unpaired_device(uuid, code)
     result = {"code": code, "uuid": uuid}
     return nice_json(result)
@@ -226,7 +226,7 @@ def send_mail(uuid=""):
 @requires_auth
 def metric(uuid="", name=""):
     data = request.json
-    print name, data
+    print(name, data)
     device = DEVICES.get_device_by_uuid(uuid)
     if device is None:
         return

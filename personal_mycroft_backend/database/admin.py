@@ -1,8 +1,9 @@
 from sqlalchemy import Column, Text, String, Integer, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
-from database import Base
-
+from personal_mycroft_backend.database import Base
+from os.path import expanduser, join, exists
+from os import makedirs
 
 class Admin(Base):
     __tablename__ = "admins"
@@ -15,7 +16,12 @@ class Admin(Base):
 
 
 class AdminDatabase(object):
-    def __init__(self, path='sqlite:///admins.db', debug=False):
+    def __init__(self, path=None, debug=False):
+        if path is None:
+            path = join(expanduser("~"), ".mycroft", "personal_backend")
+            if not exists(path):
+                makedirs(path)
+            path = 'sqlite:///' + join(path, 'admins.db')
         self.db = create_engine(path)
         self.db.echo = debug
 

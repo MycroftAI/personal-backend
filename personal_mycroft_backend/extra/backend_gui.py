@@ -1,7 +1,7 @@
 try:
     import webview
 except ImportError:
-    print "ERROR: run pip install pywebview"
+    print("ERROR: run pip install pywebview")
     raise
 
 from settings import SSL, WEBSITE_PORT

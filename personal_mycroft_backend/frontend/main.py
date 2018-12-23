@@ -4,9 +4,10 @@ from flask import redirect, url_for, render_template, request, \
 import json
 import time
 from os.path import join
-from frontend import app, utils
-from frontend.forms import LoginForm, PairingForm
-from frontend.decorators import noindex, donation, check_confirmed, requires_auth
+from personal_mycroft_backend.frontend import app, utils
+from personal_mycroft_backend.frontend.forms import LoginForm, PairingForm
+from personal_mycroft_backend.frontend.decorators import noindex, donation, check_confirmed, \
+    requires_auth
 
 
 @app.route('/favicon.ico')

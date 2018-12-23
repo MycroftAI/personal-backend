@@ -9,32 +9,30 @@ Personal mycroft backend alternative to mycroft.home, written in flask
 
 you can run it, but why would you before it's finished?
 
-# usage
+Pull Requests welcome
+
+## Install
 
 
-wait until it is finished
+    git clone https://github.com/JarbasAl/personal-mycroft-backend
+    cd personal-mycroft-backend
+    pip install .
 
 
-configure backend by editing settings.py
+configure backend by editing/creating ~/.mycroft/personal_backend/personal_backend.conf
 
-    SECRET_KEY = 'MY_PRECIOUS_SECRET_KEY'
-    SECURITY_PASSWORD_SALT = 'MY_TABLE_SALT'
-    API_VERSION = "v0.1"
-    SQL_ADMINS_URI = "sqlite:///database/admins.db"
-    SQL_DEVICES_URI = "sqlite:///database/devices.db"
-    DEBUG = True
-    SSL = False
-    SSL_CERT = ""
-    SSL_KEY = ""
-    BACKEND_PORT = 6712
-    WEBSITE_PORT = 5000
-    MAIL_SERVER = 'smtp.googlemail.com'
-    MAIL_PORT = 465
-    MAIL_USE_TLS = False
-    MAIL_USE_SSL = True
-    MAIL_USERNAME = "will.send.from.here@gmail.com"
-    MAIL_PASSWORD = "not a passwd"
-    MAIL_DEFAULT_SENDER = "will.send.from.here@gmail.com"
+    {
+    "backend_port": 6712,
+    "mail_password": "xxx",
+    "ssl_key": "/home/user/.mycroft/personal_backend/certs/MycroftPersonalServer.key",
+    "ssl_cert": "/home/user/.mycroft/personal_backend/certs/MycroftPersonalServer.crt",
+    "website_port": 5000,
+    "mail_port": 465,
+    "mail_server": "smtp.googlemail.com",
+    "mail_user": "xxx@gmail.com",
+    "secret_key": "MY_PRECIOUS_SECRET_KEY",
+    "salt": "MY_TABLE_SALT"
+    }
 
 change url in "server" section in your default mycroft config
 
@@ -48,10 +46,45 @@ change url in "server" section in your default mycroft config
       },
 
 
-start your backend by running start_backend.py, start website by running start_frontend.py
+
+## usage
+
+start backend 
+
+    from personal_mycroft_backend.backend import start_backend
+    
+    start_backend()
+
+start frontend
+
+    from personal_mycroft_backend.frontend import start_frontend
+    
+    start_frontend()
+    
+add an admin key
+
+    from personal_mycroft_backend.database.admin import AdminDataBase
+    
+    db = AdminDatabase(debug=True)
+    name = "jarbas"
+    mail = "jarbasai@mailfence.com"
+    api = "admin_key"
+    db.add_user(name, mail, api)
+    
+    
+quickly pair a device by
 
 
-# Features
+    from from personal_mycroft_backend.backend.remote_admin_api import BackendMycroftAPI
+
+    ap = BackendMycroftAPI("admin_key")
+    username = "jarbasX"
+    code = "XQFTNM"
+    uuid = "cc3524c7-ff52-42b3-af8f-de89249b19c8"
+    mail = "fakemail2@not_real.com"
+    print ap.pair(code, uuid, mail, username)
+
+## Features
 
 
 - get location
@@ -81,21 +114,6 @@ start your backend by running start_backend.py, start website by running start_f
 - local browserless GUI if running on same machine (testing)
 
 
-
-# remote admin api
-
-
-quickly pair a device by
-
-
-    from api import BackendMycroftAPI
-
-    ap = BackendMycroftAPI("admin_key")
-    username = "jarbasX"
-    code = "XQFTNM"
-    uuid = "cc3524c7-ff52-42b3-af8f-de89249b19c8"
-    mail = "fakemail2@not_real.com"
-    print ap.pair(code, uuid, mail, username)
 
 # TODOS
 

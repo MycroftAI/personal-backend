@@ -3,13 +3,13 @@ import json
 from flask import request
 from speech_recognition import Recognizer, AudioFile
 
-from backend import app, API_VERSION, USE_DEEPSPEECH
-from backend.decorators import noindex, requires_auth
+from personal_mycroft_backend.backend import app, API_VERSION, USE_DEEPSPEECH
+from personal_mycroft_backend.backend.decorators import noindex, requires_auth
 
 recognizer = Recognizer()
 
 if USE_DEEPSPEECH:
-    from extra.deepspeech_stt import DeepSpeechSTT
+    from personal_mycroft_backend.extra.deepspeech_stt import DeepSpeechSTT
 
     engine = DeepSpeechSTT()
     recognize = engine.recognize

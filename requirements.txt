@@ -6,3 +6,4 @@ requests>=2.2.1
 Flask-Mail
 pygeoip
 SpeechRecognition
+pyOpenSSL

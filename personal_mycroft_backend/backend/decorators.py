@@ -1,7 +1,7 @@
 import time
 from functools import wraps
 from flask import make_response, request, Response
-from backend import DEVICES, ADMINS
+from personal_mycroft_backend.backend import DEVICES, ADMINS
 
 
 def add_response_headers(headers=None):

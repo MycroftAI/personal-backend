@@ -1,7 +1,7 @@
-from backend import app, API_VERSION, DEVICES
-from backend.utils import nice_json, gen_api
-from backend.decorators import noindex, donation, requires_admin
-from database import model_to_dict
+from personal_mycroft_backend.backend import app, API_VERSION, DEVICES
+from personal_mycroft_backend.backend.utils import nice_json, gen_api
+from personal_mycroft_backend.backend.decorators import noindex, donation, requires_admin
+from personal_mycroft_backend.database import model_to_dict
 
 from flask import request, Response
 import time

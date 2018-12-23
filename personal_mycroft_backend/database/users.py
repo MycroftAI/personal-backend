@@ -1,7 +1,7 @@
-from database import Base
+from personal_mycroft_backend.database import Base
 from sqlalchemy import create_engine
-from database.devices import User, UnpairedDevice
-from settings import SQL_DEVICES_URI
+from personal_mycroft_backend.database.devices import User, UnpairedDevice
+from personal_mycroft_backend.settings import SQL_DEVICES_URI
 
 
 def db_connect():

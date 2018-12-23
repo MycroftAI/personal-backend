@@ -1,7 +1,7 @@
 import requests
 from requests.exceptions import ConnectionError
 
-from settings import DEBUG
+from personal_mycroft_backend.settings import DEBUG
 
 if DEBUG:
     # filter warnings, TODO this should be removed once we stop using self signed certs
@@ -29,7 +29,7 @@ class BackendMycroftAPI(object):
             try:
                 return response.json()
             except:
-                print response.text
+                print(response.text)
                 raise ValueError("Invalid admin api key")
         except ConnectionError as e:
             raise ConnectionError("Could not connect: " + str(e))
@@ -41,6 +41,6 @@ if __name__ == "__main__":
     code = "XQFTNM"
     uuid = "cc3524c7-ff52-42b3-af8f-de89249b19c8"
     mail = "fakemail2@not_real.com"
-    print ap.pair(code, uuid, mail, username)
+    print(ap.pair(code, uuid, mail, username))
 
 

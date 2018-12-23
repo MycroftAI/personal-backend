@@ -3,10 +3,10 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Text, \
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.exc import IntegrityError
 
-from database import Base
+from personal_mycroft_backend.database import Base
 
 import time
-from database import props
+from personal_mycroft_backend.database import props
 
 ## association tables
 
@@ -434,7 +434,7 @@ class DeviceDatabase(object):
                     setattr(location, arg, val)
                     self.session.commit()
                 except Exception as e:
-                    print e
+                    print(e)
                 except IntegrityError:
                     self.session.rollback()
 
@@ -485,7 +485,7 @@ class DeviceDatabase(object):
         try:
             self.session.add(device)
         except Exception as e:
-            print "ERROR PAIRING DEVICE", e
+            print("ERROR PAIRING DEVICE", e)
             return False
         return self.commit()
 
@@ -507,7 +507,7 @@ class DeviceDatabase(object):
 
         user = self.get_user_by_mail(mail) or self.get_user_by_uuid(uuid)
         if user is None:
-            print "NOT PAIRED"
+            print("NOT PAIRED")
             return False
 
         device = self.get_device_by_uuid(uuid)

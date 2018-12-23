@@ -1,4 +1,4 @@
-from backend import start_backend
+from personal_mycroft_backend.backend import start_backend
 
 __author__ = "JarbasAI"
 

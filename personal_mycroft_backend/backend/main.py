@@ -1,7 +1,7 @@
-from backend.utils import nice_json
-from backend.decorators import noindex, donation
+from personal_mycroft_backend.backend.utils import nice_json
+from personal_mycroft_backend.backend.decorators import noindex, donation
 
-from backend import app
+from personal_mycroft_backend.backend import app
 
 
 @app.route("/", methods=['GET'])

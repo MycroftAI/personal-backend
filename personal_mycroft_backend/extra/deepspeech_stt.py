@@ -3,8 +3,8 @@ from __future__ import absolute_import, division
 from timeit import default_timer as timer
 from os.path import exists, join, dirname
 
-from extra.deepspeech_settings import *
-from extra.download import download, untar
+from personal_mycroft_backend.extra.deepspeech_settings import *
+from personal_mycroft_backend.extra.download import download, untar
 
 try:
     from deepspeech.model import Model

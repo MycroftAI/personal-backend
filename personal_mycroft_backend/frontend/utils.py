@@ -9,10 +9,10 @@ from contextlib import contextmanager
 import bcrypt
 from smtplib import SMTPRecipientsRefused
 
-from frontend import mail
-from settings import SECURITY_PASSWORD_SALT, SECRET_KEY, MAIL_DEFAULT_SENDER
-from database.users import *
-from backend import DEVICES
+from personal_mycroft_backend.frontend import mail
+from personal_mycroft_backend.settings import SECURITY_PASSWORD_SALT, SECRET_KEY, MAIL_DEFAULT_SENDER
+from personal_mycroft_backend.database.users import *
+from personal_mycroft_backend.backend import DEVICES
 
 
 @contextmanager
@@ -62,9 +62,9 @@ def add_user(username, password, email):
         except IntegrityError:
             s.rollback()
         except SMTPRecipientsRefused:
-            print "invalid email provided"
+            print("invalid email provided")
         except Exception as e:
-            print e
+            print(e)
     return False
 
 
