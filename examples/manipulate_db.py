@@ -4,7 +4,7 @@ db = DeviceDatabase()
 
 username = "test_user"
 code = "XQFTNM"
-uuid = "cc3524c7-ff52-42b3-af8f-de89249b19c8"
+uuid = "cc3524c7-ff52-42b3-af8f-de89249b19c8s"
 mail = "fakemail2@not_real.com"
 
 # add a device to the db
@@ -15,16 +15,13 @@ if not db.add_device(uuid):
 
     if not db.add_device(uuid):
         # user did not pair yet, perform manual pairing
-        from personal_mycroft_backend.backend.remote_admin_api import \
-            BackendMycroftAPI
-
-        ap = BackendMycroftAPI("admin_key", url="http://0.0.0.0:6712/v0.1/")
-        print(ap.pair(code, uuid, mail, username))
-
+        device = db.get_unpaired_by_code(code)
+        if device:
+            db.add_user(mail, username, "password")
+            if db.add_device(uuid=device.uuid, mail=mail):
+                db.remove_unpaired(device.uuid)
 
 # Browse the db
-from pprint import pprint
-
 device = db.get_device_by_uuid(uuid)
 print(device.name)
 print(device.last_seen)
@@ -54,31 +51,6 @@ print(stt.engine_type)
 stt.engine_type = "google"
 
 db.commit()  # save changes
-
-location_conf = {
-    "city": {
-      "code": "Lawrence",
-      "name": "Lawrence",
-      "state": {
-        "code": "KS",
-        "name": "Kansas",
-        "country": {
-          "code": "US",
-          "name": "United States"
-        }
-      }
-    },
-    "coordinate": {
-      "latitude": 38.971669,
-      "longitude": -95.23525
-    },
-    "timezone": {
-      "code": "America/Chicago",
-      "name": "Central Standard Time",
-      "dstOffset": 3600000,
-      "offset": -21600000
-    }
-  }
 
 user = device.user
 print(user.mail)
