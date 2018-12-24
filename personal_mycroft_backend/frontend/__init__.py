@@ -3,11 +3,12 @@ from flask_mail import Mail
 
 from personal_mycroft_backend.settings import *
 from personal_mycroft_backend.database.users import db_connect
-
+from os.path import dirname, join
 
 def create_app():
     engine = db_connect()
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder=join(dirname(__file__), "static"),
+                template_folder=join(dirname(__file__), "templates"))
     app.config["SECRET_KEY"] = SECRET_KEY
     app.config['SECURITY_PASSWORD_SALT'] = SECURITY_PASSWORD_SALT
     app.config["MAIL_SERVER"] = MAIL_SERVER
