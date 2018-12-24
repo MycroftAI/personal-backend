@@ -1,7 +1,7 @@
 from functools import wraps
 from flask import redirect, url_for, flash, session
-from backend.decorators import noindex, donation
-from frontend.utils import get_user
+from personal_mycroft_backend.backend.decorators import noindex, donation
+from personal_mycroft_backend.frontend.utils import get_user
 
 
 def authenticate():

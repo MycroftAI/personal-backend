@@ -9,7 +9,6 @@ from contextlib import contextmanager
 import bcrypt
 from smtplib import SMTPRecipientsRefused
 
-from personal_mycroft_backend.frontend import mail
 from personal_mycroft_backend.settings import SECURITY_PASSWORD_SALT, SECRET_KEY, MAIL_DEFAULT_SENDER
 from personal_mycroft_backend.database.users import *
 from personal_mycroft_backend.backend import DEVICES
@@ -47,7 +46,7 @@ def get_device():
     return None
 
 
-def add_user(username, password, email):
+def add_user(username, password, email, mail_sender):
     token = generate_confirmation_token(email)
     with session_scope() as s:
         try:
@@ -55,7 +54,7 @@ def add_user(username, password, email):
             confirm_url = url_for('confirm', token=token, _external=True)
             html = render_template('activate.html', confirm_url=confirm_url)
             subject = "Please confirm your email"
-            send_confirmation_mail(email, subject, html)
+            send_confirmation_mail(email, subject, html, mail_sender)
             s.add(u)
             s.commit()
             return True
@@ -132,11 +131,11 @@ def confirm_token(token, expiration=3600):
     return email
 
 
-def send_confirmation_mail(to, subject, template):
+def send_confirmation_mail(to, subject, template, mail_sender):
     msg = Message(
         subject,
         recipients=[to],
         html=template,
         sender=MAIL_DEFAULT_SENDER
     )
-    mail.send(msg)
+    mail_sender.send(msg)
