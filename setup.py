@@ -14,9 +14,10 @@ extra_files = package_files('personal_mycroft_backend')
 
 setup(
     name='personal-mycroft-backend',
-    version='0.1.2',
+    version='0.1.3',
     packages=['personal_mycroft_backend', 'personal_mycroft_backend.extra',
               'personal_mycroft_backend.backend',
+              'personal_mycroft_backend.utils',
               'personal_mycroft_backend.database',
               'personal_mycroft_backend.frontend'],
     install_requires=['Flask>=0.12', 'WTForms>=2.1', 'SQLAlchemy>=1.1.9',

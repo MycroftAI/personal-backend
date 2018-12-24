@@ -1,7 +1,7 @@
 from os.path import exists, expanduser, join
 from os import makedirs
-from personal_mycroft_backend.extra.self_signed import create_self_signed_cert
-from personal_mycroft_backend.extra.json_helper import load_commented_json, \
+from personal_mycroft_backend.utils.self_signed import create_self_signed_cert
+from personal_mycroft_backend.utils.json_helper import load_commented_json, \
     merge_dict
 import json
 
