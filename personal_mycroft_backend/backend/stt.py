@@ -3,18 +3,12 @@ import json
 from flask import request
 from speech_recognition import Recognizer, AudioFile
 
-from personal_mycroft_backend.backend import API_VERSION, USE_DEEPSPEECH
+from personal_mycroft_backend.backend import API_VERSION
 from personal_mycroft_backend.backend.decorators import noindex, requires_auth
+from personal_mycroft_backend.stt import STTFactory
 
 recognizer = Recognizer()
-
-if USE_DEEPSPEECH:
-    from personal_mycroft_backend.extra.deepspeech_stt import DeepSpeechSTT
-
-    engine = DeepSpeechSTT()
-    recognize = engine.recognize
-else:
-    recognize = recognizer.recognize_google
+engine = STTFactory.create()
 
 
 def get_stt_routes(app):
@@ -29,7 +23,7 @@ def get_stt_routes(app):
             with AudioFile(fp.name) as source:
                 audio = recognizer.record(source)  # read the entire audio file
 
-            utterance = recognize(audio, language=lang)
+            utterance = engine.execute(audio, language=lang)
         return json.dumps([utterance])
 
     return app

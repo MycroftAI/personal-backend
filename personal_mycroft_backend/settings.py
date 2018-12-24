@@ -48,9 +48,14 @@ MAIL_USERNAME = conf.get("mail_user", "xxx@gmail.com")
 MAIL_PASSWORD = conf.get("mail_password", "xxx")
 MAIL_DEFAULT_SENDER = conf.get("mail_sender", MAIL_USERNAME)
 
+STT_CONFIG = conf.get("stt") or {"module": "google"}
+
+LANG = conf.get("lang", "en-us")
 
 def create_conf_file():
     default_conf = {
+        "lang": LANG,
+        "stt": STT_CONFIG,
         "backend_port": BACKEND_PORT,
         "website_port": WEBSITE_PORT,
         "secret_key": SECRET_KEY,
