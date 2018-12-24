@@ -27,13 +27,14 @@ configure backend by editing/creating ~/.mycroft/personal_backend/personal_backe
 
     {
     "backend_port": 6712,
-    "mail_password": "xxx",
+    "website_port": 5000,
+    "ssl": true,
     "ssl_key": "/home/user/.mycroft/personal_backend/certs/MycroftPersonalServer.key",
     "ssl_cert": "/home/user/.mycroft/personal_backend/certs/MycroftPersonalServer.crt",
-    "website_port": 5000,
     "mail_port": 465,
     "mail_server": "smtp.googlemail.com",
     "mail_user": "xxx@gmail.com",
+    "mail_password": "xxx",
     "secret_key": "MY_PRECIOUS_SECRET_KEY",
     "salt": "MY_TABLE_SALT"
     }
@@ -65,28 +66,7 @@ start frontend
     
     start_frontend()
     
-add an admin key
-
-    from personal_mycroft_backend.database.admin import AdminDataBase
-    
-    db = AdminDatabase(debug=True)
-    name = "jarbas"
-    mail = "jarbasai@mailfence.com"
-    api = "admin_key"
-    db.add_user(name, mail, api)
-    
-    
-quickly pair a device by
-
-
-    from from personal_mycroft_backend.backend.remote_admin_api import BackendMycroftAPI
-
-    ap = BackendMycroftAPI("admin_key")
-    username = "jarbasX"
-    code = "XQFTNM"
-    uuid = "cc3524c7-ff52-42b3-af8f-de89249b19c8"
-    mail = "fakemail2@not_real.com"
-    print ap.pair(code, uuid, mail, username)
+more examples [here](https://github.com/JarbasAl/personal-mycroft-backend/tree/master/examples)
 
 ## Features
 
@@ -135,4 +115,4 @@ quickly pair a device by
 
 - new functionality
     - user voice print from uploaded utterances / wakewords
-    - train snowboy models
+    - train precise/snowboy models
