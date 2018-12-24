@@ -1,13 +1,14 @@
 import requests
 from requests.exceptions import ConnectionError
 
-from personal_mycroft_backend.settings import DEBUG
+from personal_mycroft_backend.settings import DEBUG, SSL
 
 
 class BackendMycroftAPI(object):
-    def __init__(self, api, lang="en-us", url="http://0.0.0.0:6712/v0.1/",
-                 debug=DEBUG):
-
+    def __init__(self, api, lang="en-us", url="https://0.0.0.0:6712/v0.1/",
+                 debug=DEBUG, ssl=SSL):
+        if not ssl:
+            url = url.replace("https", "http")
         if debug:
             # filter warnings, TODO this should be removed once we stop using self signed certs
             from requests.packages.urllib3.exceptions import \
