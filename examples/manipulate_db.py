@@ -30,9 +30,6 @@ print(device.paired)
 print(device.uuid)
 print(device.ips)
 
-db.add_ip(uuid, "0.0.0.0")
-print(device.ips)
-
 location = device.location
 print(location.city)
 
@@ -46,10 +43,14 @@ print(db.total_users())
 
 
 # Edit the db
+
+db.add_ip(uuid, "0.0.0.0")
+print(device.ips)
+
 stt = config.stt
 print(stt.engine_type)
 stt.engine_type = "google"
-
+print(stt.engine_type)
 db.commit()  # save changes
 
 user = device.user
@@ -57,10 +58,9 @@ print(user.mail)
 print(user.name)
 print(user.password)
 
-db.add_user(mail, "joe", "badPassword")
+db.add_user(mail, "joe", "AbadPassword")
 print(user.mail)
 print(user.name) # changed to joe
-print(user.password) # no longer empty
 
 
 
