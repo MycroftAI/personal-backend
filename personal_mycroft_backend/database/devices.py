@@ -7,6 +7,9 @@ from personal_mycroft_backend.database import Base
 
 import time
 from personal_mycroft_backend.database import props
+from os.path import join, expanduser, exists
+from os import makedirs
+
 
 ## association tables
 
