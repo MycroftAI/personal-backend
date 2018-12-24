@@ -14,7 +14,7 @@ extra_files = package_files('personal_mycroft_backend')
 
 setup(
     name='personal-mycroft-backend',
-    version='0.1',
+    version='0.1.2',
     packages=['personal_mycroft_backend', 'personal_mycroft_backend.extra',
               'personal_mycroft_backend.backend',
               'personal_mycroft_backend.database',
