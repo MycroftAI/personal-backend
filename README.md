@@ -100,6 +100,8 @@ more examples [here](https://github.com/JarbasAl/personal-mycroft-backend/tree/m
 
 # TODOS
 
+- most of the frontend, are you a web dev? team up with me!
+
 - STT json settings in db (for google cloud stt engine)
 
 - skill settings
