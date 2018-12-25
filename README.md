@@ -44,7 +44,7 @@ change url in "server" section in your default mycroft config
      // Address of the REMOTE server
       // Override: none
       "server": {
-        "url": "https://127.0.0.1:6712",
+        "url": "https://0.0.0.0:6712",
         "version": "v0.1",
         "update": true,
         "metrics": true
@@ -68,7 +68,7 @@ start frontend
     
 more examples [here](https://github.com/JarbasAl/personal-mycroft-backend/tree/master/examples)
 
-## Features
+## Features / Routes
 
 
 - get location
@@ -83,20 +83,19 @@ more examples [here](https://github.com/JarbasAl/personal-mycroft-backend/tree/m
 
 - pairing process
 
-- store metrics (integrating into frontend, sql db and api endpoints functional)
-
 - send mail
 
-- STT using deepspeech or google (testing )
+- multiple STT engines supported (google, wit, ibm, kaldi, bing, houndify, deepspeech_server, govivace, local deepspeech)
 
 - sql database
 
 - user email confirmation
 
+- local browserless GUI if running on same machine
+
 - website (status: WIP)
 
-- local browserless GUI if running on same machine (testing)
-
+- store metrics (WIP - integrating into frontend, sql db and api endpoints functional)
 
 
 # TODOS
@@ -111,8 +110,13 @@ more examples [here](https://github.com/JarbasAl/personal-mycroft-backend/tree/m
 
 - weather api
 
+- local data storage (audio recordings)
+
+- if opt in proxy data to mycroft (utterances/hotwords/metrics)
+
 - everything else i forgot
 
 - new functionality
+    - mimic 1 remote TTS 
     - user voice print from uploaded utterances / wakewords
     - train precise/snowboy models
