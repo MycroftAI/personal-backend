@@ -85,7 +85,7 @@ more examples [here](https://github.com/JarbasAl/personal-mycroft-backend/tree/m
 
 - send mail
 
-- multiple STT engines supported (google, wit, ibm, kaldi, bing, houndify, deepspeech_server, govivace, local deepspeech)
+- multiple STT engines supported (google, wit, ibm, kaldi, bing, houndify, govivace, deepspeech)
 
 - sql database
 
