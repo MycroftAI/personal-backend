@@ -40,7 +40,7 @@ class TokenSTT(STT):
 
     def __init__(self):
         super(TokenSTT, self).__init__()
-        self.token = str(self.credential.get("token"))
+        self.token = self.credential.get("token")
 
 
 class GoogleJsonSTT(STT):
@@ -96,7 +96,7 @@ class WITSTT(TokenSTT):
         super(WITSTT, self).__init__()
 
     def execute(self, audio, language=None):
-        LOG.warning("WITSTT language should be configured at wit.ai settings.")
+        print("WITSTT language should be configured at wit.ai settings.")
         return self.recognizer.recognize_wit(audio, self.token)
 
 
