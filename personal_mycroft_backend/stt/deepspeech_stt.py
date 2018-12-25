@@ -114,11 +114,12 @@ class DeepSpeechV01STT(object):
 
     def download(self):
         print("starting model download")
-        target_folder = join(dirname(__file__), "deepspeech")
+        target_folder = self.DEEPSPEECH_DATADIR
         self.dl = download(self.MODEL_DOWNLOAD_URL, target_folder,
                            self._extract)
 
-    def _extract(self, target_folder=join(dirname(__file__), "deepspeech")):
+    def _extract(self, target_folder=None):
+        target_folder = target_folder or self.DEEPSPEECH_DATADIR
         print("model downloaded, extracting files")
         untar(join(target_folder, self.MODEL_DOWNLOAD_URL.split("/")[-1]),
               target_folder, True)
