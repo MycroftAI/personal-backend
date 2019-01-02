@@ -122,3 +122,8 @@ more examples [here](https://github.com/JarbasAl/personal-mycroft-backend/tree/m
     - mimic 1 remote TTS 
     - user voice print from uploaded utterances / wakewords
     - train precise/snowboy models
+
+# Credits
+
+Thanks goes out to JarbasAI for creating this initial implementation. You can find the archived [original repo here](https://github.com/JarbasAl/ZZZ_personal-mycroft-backend).
+
