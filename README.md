@@ -91,6 +91,8 @@ more examples [here](https://github.com/MycroftAI/personal-mycroft-backend/tree/
 
 - user email confirmation
 
+- wake word upload
+
 - local browserless GUI if running on same machine
 
 - website (status: WIP)
