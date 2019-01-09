@@ -25,7 +25,9 @@ SQL_DEVICES_URI = conf.get("devices_db",
                            'sqlite:///' + join(DATA_PATH, 'devices.db'))
 
 # PRECISE
-PRECISE_DATA_FOLDER = expanduser('~/precise/upload')
+PRECISE_DATA_FOLDER = conf.get("wuw_folder", expanduser('~/precise/upload'))
+if not exists(PRECISE_DATA_FOLDER):
+    makedirs(PRECISE_DATA_FOLDER)
 
 # SSL
 SSL = conf.get("ssl", False)
@@ -55,6 +57,7 @@ STT_CONFIG = conf.get("stt") or {"module": "google"}
 
 LANG = conf.get("lang", "en-us")
 
+
 def create_conf_file():
     default_conf = {
         "lang": LANG,
@@ -69,7 +72,8 @@ def create_conf_file():
         "mail_user": MAIL_USERNAME,
         "mail_password": MAIL_PASSWORD,
         "mail_server": MAIL_SERVER,
-        "mail_port": MAIL_PORT
+        "mail_port": MAIL_PORT,
+        "wuw_folder": PRECISE_DATA_FOLDER
     }
     if exists(CONF_FILE):
         merge_dict(default_conf, load_commented_json(CONF_FILE))

@@ -28,6 +28,7 @@ configure backend by editing/creating ~/.mycroft/personal_backend/personal_backe
     {
     "backend_port": 6712,
     "website_port": 5000,
+    "wuw_folder": "/home/user/precise/upload",
     "ssl": true,
     "ssl_key": "/home/user/.mycroft/personal_backend/certs/MycroftPersonalServer.key",
     "ssl_cert": "/home/user/.mycroft/personal_backend/certs/MycroftPersonalServer.crt",
