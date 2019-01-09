@@ -24,6 +24,9 @@ SQL_ADMINS_URI = conf.get("admins_db",
 SQL_DEVICES_URI = conf.get("devices_db",
                            'sqlite:///' + join(DATA_PATH, 'devices.db'))
 
+# PRECISE
+PRECISE_DATA_FOLDER = expanduser('~/precise/upload')
+
 # SSL
 SSL = conf.get("ssl", False)
 SSL_CERT = conf.get("ssl_cert")

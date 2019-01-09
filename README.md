@@ -106,8 +106,6 @@ more examples [here](https://github.com/MycroftAI/personal-mycroft-backend/tree/
 
 - skill settings
 
-- wakeword upload
-
 - wolfram alpha api
 
 - weather api

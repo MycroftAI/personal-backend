@@ -1,0 +1,18 @@
+from flask import request
+import time
+import json
+from os.path import join
+from personal_mycroft_backend.backend.decorators import noindex
+from personal_mycroft_backend.settings import PRECISE_DATA_FOLDER
+
+
+def get_precise_routes(app):
+    @app.route('/precise/upload', methods=['POST'])
+    @noindex
+    def precise_upload():
+        wavfile = request.files['audio']
+        name = str(int(time.time())) + ".wav"
+        wavfile.save(join(PRECISE_DATA_FOLDER, name))
+        return json.dumps({"status": "ok"})
+
+    return app
