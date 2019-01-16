@@ -66,7 +66,7 @@ start frontend
     
     start_frontend()
     
-more examples [here](https://github.com/MycroftAI/personal-mycroft-backend/tree/master/examples)
+more examples [here](examples)
 
 ## Features / Routes
 
