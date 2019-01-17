@@ -21,7 +21,7 @@ from source
 
 from pip
 
-    pip install personal-backend
+    pip install personal-mycroft-backend
     
 configure backend by editing/creating ~/.mycroft/personal_backend/personal_backend.conf
 
