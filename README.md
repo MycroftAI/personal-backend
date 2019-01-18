@@ -11,6 +11,8 @@ you can run it, but why would you before it's finished?
 
 Pull Requests welcome
 
+Mycroft Backend API docs can be found [here](https://mycroftai.github.io/mycroft-api-docs-renderer/)
+
 ## Install
 
 from source
