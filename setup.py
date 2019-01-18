@@ -26,9 +26,9 @@ setup(
                       "flask_sslify"],
     package_data={'': extra_files},
     include_package_data=True,
-    url='',
-    license='MIT',
+    url='https://github.com/MycroftAI/personal-backend',
+    license='Apache-2.0',
     author='jarbasAI',
     author_email='jarbasai@mailfence.com',
-    description=''
+    description='personal mycroft backend'
 )
