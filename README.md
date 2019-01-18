@@ -67,8 +67,9 @@ start frontend
     from personal_mycroft_backend.frontend import start_frontend
     
     start_frontend()
-    
-more examples [here](https://github.com/MycroftAI/personal-backend/tree/master/examples)
+
+
+more examples [here](examples)
 
 ## Features / Routes
 
