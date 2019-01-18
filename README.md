@@ -15,8 +15,8 @@ Pull Requests welcome
 
 from source
 
-    git clone https://github.com/MycroftAI/personal-mycroft-backend
-    cd personal-mycroft-backend
+    git clone https://github.com/MycroftAI/personal-backend
+    cd personal-backend
     pip install .
 
 from pip
@@ -66,7 +66,7 @@ start frontend
     
     start_frontend()
     
-more examples [here](https://github.com/MycroftAI/personal-mycroft-backend/tree/master/examples)
+more examples [here](https://github.com/MycroftAI/personal-backend/tree/master/examples)
 
 ## Features / Routes
 

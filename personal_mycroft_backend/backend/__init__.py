@@ -45,7 +45,7 @@ def create_app():
 def start_backend(port=BACKEND_PORT):
     if SSL:
         import ssl
-        context = ssl.SSLContext(ssl.PROTOCOL_SSLv3)
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
         context.load_cert_chain(SSL_CERT, SSL_KEY)
 
         app = create_app()
