@@ -11,12 +11,14 @@ you can run it, but why would you before it's finished?
 
 Pull Requests welcome
 
+Mycroft Backend API docs can be found [here](https://mycroftai.github.io/mycroft-api-docs-renderer/)
+
 ## Install
 
 from source
 
-    git clone https://github.com/MycroftAI/personal-mycroft-backend
-    cd personal-mycroft-backend
+    git clone https://github.com/MycroftAI/personal-backend
+    cd personal-backend
     pip install .
 
 from pip
@@ -65,7 +67,8 @@ start frontend
     from personal_mycroft_backend.frontend import start_frontend
     
     start_frontend()
-    
+
+
 more examples [here](examples)
 
 ## Features / Routes
