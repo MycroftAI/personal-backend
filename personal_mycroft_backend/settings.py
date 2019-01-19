@@ -1,8 +1,3 @@
-from os.path import exists, expanduser, join
-from os import makedirs
-from personal_mycroft_backend.utils.self_signed import create_self_signed_cert
-from personal_mycroft_backend.utils.json_helper import load_commented_json, \
-    merge_dict
 # Copyright 2019 Mycroft AI Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +12,11 @@ from personal_mycroft_backend.utils.json_helper import load_commented_json, \
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+from os.path import exists, expanduser, join
+from os import makedirs
+from personal_mycroft_backend.utils.self_signed import create_self_signed_cert
+from personal_mycroft_backend.utils.json_helper import load_commented_json, \
+    merge_dict
 import json
 
 DATA_PATH = join(expanduser("~"), ".mycroft", "personal_backend")
