@@ -30,6 +30,7 @@ configure backend by editing/creating ~/.mycroft/personal_backend/personal_backe
     {
     "backend_port": 6712,
     "website_port": 5000,
+    "wuw_folder": "/home/user/precise/upload",
     "ssl": true,
     "ssl_key": "/home/user/.mycroft/personal_backend/certs/MycroftPersonalServer.key",
     "ssl_cert": "/home/user/.mycroft/personal_backend/certs/MycroftPersonalServer.crt",
@@ -92,6 +93,8 @@ more examples [here](examples)
 
 - sql database
 
+- wake word upload
+
 - user email confirmation
 
 - local browserless GUI if running on same machine
@@ -108,8 +111,6 @@ more examples [here](examples)
 - STT json settings in db (for google cloud stt engine)
 
 - skill settings
-
-- wakeword upload
 
 - wolfram alpha api
 
