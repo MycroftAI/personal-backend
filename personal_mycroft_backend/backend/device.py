@@ -180,7 +180,7 @@ def get_device_routes(app, mail_sender):
         return nice_json(result)
 
 
-    @app.route("/" + API_VERSION + "/device", methods=['GET'])
+    @app.route("/" + API_VERSION + "/device/", methods=['GET'])
     @noindex
     @donation
     @requires_auth
