@@ -15,10 +15,10 @@ def get_precise_routes(app):
             fn = uploads[precisefile].filename
             if fn == 'audio':
                 name = (str(int(time.time()))) + ".wav"
-                uploads[precisefile].save(os.path.join(app.config['UPLOAD_FOLDER'], name))
+                uploads[precisefile].save(os.path.join(app.config['PRECISE_DATA_FOLDER'], name))
             
             if fn == 'metadata':
                 name =  (str(int(time.time()))) + ".meta"
-                uploads[precisefile].save(os.path.join(app.config['UPLOAD_FOLDER'], name))
+                uploads[precisefile].save(os.path.join(app.config['PRECISE_DATA_FOLDER'], name))
 
     return app
