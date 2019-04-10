@@ -18,8 +18,9 @@ from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.exc import IntegrityError
 
 from personal_mycroft_backend.database import Base
-
+import json
 import time
+import hashlib
 from personal_mycroft_backend.database import props
 from os.path import join, expanduser, exists
 from os import makedirs
@@ -346,7 +347,7 @@ class Hotword(Base):
     active = Column(Boolean, default=True)
     listen = Column(Boolean, default=False)
     utterance = Column(String, default="")
-    sound =Column(String, default="")
+    sound = Column(String, default="")
     lang = Column(String, default="en-us")
 
     device = relationship("Device", back_populates="hotwords",
@@ -354,7 +355,7 @@ class Hotword(Base):
     user = relationship("User", back_populates="hotwords",
                         secondary=hotword_users, uselist=False)
     config = relationship("Configuration", back_populates="hotwords",
-                        secondary=hotword_configs, uselist=False)
+                          secondary=hotword_configs, uselist=False)
 
 
 class Sound(Base):
@@ -403,7 +404,7 @@ class TTS(Base):
 
 
 class DeviceDatabase(object):
-    def __init__(self, path=None, debug=False):
+    def __init__(self, path=None, debug=False, session=None):
         if path is None:
             path = join(expanduser("~"), ".mycroft", "personal_backend")
             if not exists(path):
@@ -412,12 +413,16 @@ class DeviceDatabase(object):
 
         self.db = create_engine(path)
         self.db.echo = debug
-        Session = sessionmaker(bind=self.db)
-        self.session = Session()
+        if session:
+            self.session = session
+        else:
+            Session = sessionmaker(bind=self.db)
+            self.session = Session()
         Base.metadata.create_all(self.db)
 
     def get_user_by_pairing_code(self, pairing_code):
-        return self.session.query(User).filter(User.pairing_code == pairing_code).first()
+        return self.session.query(User).filter(
+            User.pairing_code == pairing_code).first()
 
     def get_user_by_id(self, user_id):
         return self.session.query(User).filter(User.id == user_id).first()
@@ -439,7 +444,7 @@ class DeviceDatabase(object):
                                                    token).first()
         if not device:
             device = self.session.query(Device).filter(Device.refreshToken ==
-                                                 token).first()
+                                                       token).first()
         return device
 
     def add_location(self, uuid, location_data=None):
@@ -557,8 +562,8 @@ class DeviceDatabase(object):
                               device=device,
                               user=user)
             wakeword = Hotword(id=self.session.query(Hotword).count() + 1,
-                              device=device,
-                              user=user, phonemes="W EY K . AH P",
+                               device=device,
+                               user=user, phonemes="W EY K . AH P",
                                threshold="1e-20", name="wake up")
             config.hotwords.append(hotword)
             config.hotwords.append(wakeword)
@@ -624,3 +629,15 @@ class DeviceDatabase(object):
         except IntegrityError:
             self.session.rollback()
         return False
+
+    def close(self):
+        self.session.close()
+
+    def __enter__(self):
+        """ Context handler """
+        return self
+
+    def __exit__(self, _type, value, traceback):
+        """ Commits changes and Closes the session """
+        self.commit()
+        self.close()

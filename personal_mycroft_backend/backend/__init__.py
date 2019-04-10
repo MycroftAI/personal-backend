@@ -17,11 +17,6 @@ from flask import Flask
 from flask_mail import Mail
 from flask_sslify import SSLify
 from personal_mycroft_backend.settings import *
-from personal_mycroft_backend.database.admin import AdminDatabase
-from personal_mycroft_backend.database.devices import DeviceDatabase
-
-ADMINS = AdminDatabase(SQL_ADMINS_URI, debug=DEBUG)
-DEVICES = DeviceDatabase(SQL_DEVICES_URI, debug=DEBUG)
 
 
 def create_app():
@@ -54,6 +49,7 @@ def create_app():
                 "author": "JarbasAI"
             }
         })
+
     return app
 
 
