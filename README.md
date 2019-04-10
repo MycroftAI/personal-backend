@@ -21,6 +21,9 @@ from source
     cd personal-backend
     pip install .
 
+from pip
+
+    pip install git+https://github.com/MycroftAI/personal-backend.git
     
 configure backend by editing/creating ~/.mycroft/personal_backend/personal_backend.conf
 
