@@ -20,7 +20,6 @@ from sqlalchemy.exc import IntegrityError
 from personal_mycroft_backend.database import Base
 import json
 import time
-import hashlib
 from personal_mycroft_backend.database import props
 from os.path import join, expanduser, exists
 from os import makedirs
