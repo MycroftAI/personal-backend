@@ -93,6 +93,7 @@ def geo_locate(ip):
     if ip in ["0.0.0.0", "127.0.0.1"]:
         response = requests.get("https://ipapi.co/json/")
         data = response.json()
+        data["country_code"] = data["country"]
     else:
         g = pygeoip.GeoIP(join(root_dir(), 'database',
                                        'GeoLiteCity.dat'))
@@ -103,7 +104,7 @@ def geo_locate(ip):
 
 def location_dict(city="", region_code="", country_code="",
              country_name="", region="", longitude=0, latitude=0,
-             timezone=""):
+             timezone="", **kwargs):
     region_data = {"code": region_code, "name": region,
                         "country": {
                             "code": country_code,

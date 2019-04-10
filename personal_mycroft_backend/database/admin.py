@@ -19,6 +19,7 @@ from personal_mycroft_backend.database import Base
 from os.path import expanduser, join, exists
 from os import makedirs
 
+
 class Admin(Base):
     __tablename__ = "admins"
     id = Column(Integer, primary_key=True)
@@ -30,7 +31,7 @@ class Admin(Base):
 
 
 class AdminDatabase(object):
-    def __init__(self, path=None, debug=False):
+    def __init__(self, path=None, debug=False, session=None):
         if path is None:
             path = join(expanduser("~"), ".mycroft", "personal_backend")
             if not exists(path):
@@ -39,8 +40,11 @@ class AdminDatabase(object):
         self.db = create_engine(path)
         self.db.echo = debug
 
-        Session = sessionmaker(bind=self.db)
-        self.session = Session()
+        if session:
+            self.session = session
+        else:
+            Session = sessionmaker(bind=self.db)
+            self.session = Session()
         Base.metadata.create_all(self.db)
 
     def update_timestamp(self, user_name, timestamp):
@@ -72,7 +76,7 @@ class AdminDatabase(object):
     def add_user(self, name=None, mail=None, api=""):
         try:
             user = Admin(api_key=api, name=name, mail=mail,
-                         id=self.total_users()+1)
+                         id=self.total_users() + 1)
             self.session.add(user)
             self.session.commit()
             return True
@@ -84,7 +88,25 @@ class AdminDatabase(object):
         return self.session.query(Admin).count()
 
     def commit(self):
-        self.session.commit()
+        try:
+            self.session.commit()
+            return True
+        except IntegrityError:
+            self.session.rollback()
+        return False
+
+    def close(self):
+        self.session.close()
+
+    def __enter__(self):
+        """ Context handler """
+        return self
+
+    def __exit__(self, _type, value, traceback):
+        """ Commits changes and Closes the session """
+        self.commit()
+        self.close()
+
 
 if __name__ == "__main__":
     db = AdminDatabase(debug=True)
@@ -92,5 +114,3 @@ if __name__ == "__main__":
     mail = "jarbasai@mailfence.com"
     api = "admin_key"
     db.add_user(name, mail, api)
-
-

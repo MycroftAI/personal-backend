@@ -164,7 +164,7 @@ def get_routes(app, mail_sender):
             status = "NOT Paired"
             if form.validate():
                 code = request.form['code']
-                if utils.pair(code):
+                if utils.pair(code, mail_sender):
                     status = "Paired"
             return json.dumps({'status': status})
         return render_template('devices.html', form=form)

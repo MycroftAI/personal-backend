@@ -23,9 +23,10 @@ from contextlib import contextmanager
 import bcrypt
 from smtplib import SMTPRecipientsRefused
 
-from personal_mycroft_backend.settings import SECURITY_PASSWORD_SALT, SECRET_KEY, MAIL_DEFAULT_SENDER
+from personal_mycroft_backend.settings import SECURITY_PASSWORD_SALT, \
+    SECRET_KEY, MAIL_DEFAULT_SENDER, DEBUG
 from personal_mycroft_backend.database.users import *
-from personal_mycroft_backend.backend import DEVICES
+from personal_mycroft_backend.database.devices import DeviceDatabase
 
 
 @contextmanager
@@ -119,16 +120,17 @@ def generate_confirmation_token(email):
     return serializer.dumps(email, salt=SECURITY_PASSWORD_SALT)
 
 
-def pair(code):
-    device = DEVICES.get_unpaired_by_code(code)
-    if device:
-        user = get_user()
-        if DEVICES.add_device(uuid=device.uuid, mail=user.mail):
-            DEVICES.remove_unpaired(device.uuid)
-            msg = Message("Device was paired",
-                          recipients=[user.mail])
-            mail.send(msg)
-            return True
+def pair(code, mail_sender):
+    with DeviceDatabase(SQL_DEVICES_URI, debug=DEBUG) as device_db:
+        device = device_db.get_unpaired_by_code(code)
+        if device:
+            user = get_user()
+            if device_db.add_device(uuid=device.uuid, mail=user.mail):
+                device_db.remove_unpaired(device.uuid)
+                msg = Message("Device was paired",
+                              recipients=[user.mail])
+                mail_sender.send(msg)
+                return True
     return False
 
 

@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from threading import Thread
-
 import os
+import subprocess
 import tarfile
 from os.path import exists, dirname
-import subprocess
+from threading import Thread
 
 _running_downloads = {}
 
@@ -28,7 +27,7 @@ def _get_download_tmp(dest):
         return tmp_base
     else:
         i = 1
-        while(True):
+        while (True):
             tmp = tmp_base + '.' + str(i)
             if not exists(tmp):
                 return tmp

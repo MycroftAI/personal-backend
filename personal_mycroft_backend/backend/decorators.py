@@ -15,7 +15,10 @@
 import time
 from functools import wraps
 from flask import make_response, request, Response
-from personal_mycroft_backend.backend import DEVICES, ADMINS
+from personal_mycroft_backend.settings import API_VERSION, DEBUG, SQL_DEVICES_URI, \
+    SQL_ADMINS_URI
+from personal_mycroft_backend.database.devices import DeviceDatabase
+from personal_mycroft_backend.database.admin import AdminDatabase
 
 
 def add_response_headers(headers=None):
@@ -52,20 +55,24 @@ def donation(f):
 
 def check_auth(api_key):
     """This function is called to check if a api key is valid."""
-    device = DEVICES.get_device_by_token(api_key)
-    if not device:
-        return False
-    if device.expires_at < time.time():
-        return False
-    return True
+    with DeviceDatabase(SQL_DEVICES_URI, debug=DEBUG) as device_db:
+        device = device_db.get_device_by_token(api_key)
+        result = True
+        if not device:
+            result = False
+        elif device.expires_at < time.time():
+            result = False
+    return result
 
 
 def check_admin_auth(api_key):
     """This function is called to check if a api key is valid."""
-    users = ADMINS.get_user_by_api_key(api_key)
-    if not len(users):
-        return False
-    return True
+    with AdminDatabase(SQL_ADMINS_URI, debug=DEBUG) as admin_db:
+        users = admin_db.get_user_by_api_key(api_key)
+        result = True
+        if not len(users):
+            result = False
+    return result
 
 
 def authenticate():
