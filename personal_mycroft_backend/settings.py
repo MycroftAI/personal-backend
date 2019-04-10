@@ -62,7 +62,7 @@ MAIL_USERNAME = conf.get("mail_user", "xxx@gmail.com")
 MAIL_PASSWORD = conf.get("mail_password", "xxx")
 MAIL_DEFAULT_SENDER = conf.get("mail_sender", MAIL_USERNAME)
 
-STT_CONFIG = conf.get("stt") or {"module": "google"}
+STT_CONFIG = conf.get("stt") or {"module": "google", "google": {}}
 
 LANG = conf.get("lang", "en-us")
 
