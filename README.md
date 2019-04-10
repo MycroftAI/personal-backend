@@ -23,7 +23,7 @@ from source
 
 from pip
 
-    pip install personal-mycroft-backend
+    pip install git+https://github.com/MycroftAI/personal-backend.git
     
 configure backend by editing/creating ~/.mycroft/personal_backend/personal_backend.conf
 
