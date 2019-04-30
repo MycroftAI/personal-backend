@@ -148,7 +148,7 @@ config_sounds = Table('config_sounds', Base.metadata,
 
 class UnpairedDevice(Base):
     __tablename__ = 'unpaired'
-    created_at = Column(String, default=str(time.time()))
+    created_at = Column(Float, default=time.time())
     uuid = Column(String, primary_key=True, nullable=False)
     code = Column(String, nullable=False)
 
@@ -157,7 +157,7 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, nullable=False)
-    created_at = Column(String, default=time.time())
+    created_at = Column(Float, default=time.time())
     password = Column(Text)
     confirmed = Column(Boolean, nullable=False, default=False)
     confirmed_on = Column(Integer)
@@ -184,7 +184,7 @@ class Device(Base):
     __tablename__ = "devices"
 
     uuid = Column(String, primary_key=True, nullable=False)
-    created_at = Column(String, default=time.time())
+    created_at = Column(Float, default=time.time())
     description = Column(Text, default="")
     name = Column(String, default="unknown_device")
     last_seen = Column(Integer, default=0)
@@ -195,6 +195,7 @@ class Device(Base):
     subscription = Column(String, default="free")
     arch = Column(String, default="unknown")
 
+    user_name = Column(String, ForeignKey("users.name"))
     user_id = Column(Integer, ForeignKey("users.id"))
 
     user = relationship("User", back_populates="devices",
@@ -222,30 +223,27 @@ class Device(Base):
 
 class Metric(Base):
     __tablename__ = "metrics"
-    created_at = Column(Integer, default=time.time())
+    created_at = Column(Float, default=time.time())
     id = Column(Integer, primary_key=True, nullable=False)
     name = Column(String)
-
-    system = Column(String)
-    start_time = Column(Integer)
-    time = Column(Integer)
-    intent_type = Column(String)
-    lang = Column(String, default="en-us")
-    utterance = Column(String)
-    handler = Column(String)
-    transcription = Column(String)
-    source = Column(String)
+    json = Column(String)
 
     device = relationship("Device", back_populates="metrics",
-                          secondary=metrics_devices)
+                          secondary=metrics_devices, uselist=False)
     user = relationship("User", back_populates="metrics",
-                        secondary=metrics_users)
+                        secondary=metrics_users, uselist=False)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    user_name = Column(String, ForeignKey("users.name"))
+
+    @property
+    def data(self):
+        return json.loads(self.json)
 
 
 class Skill(Base):
     __tablename__ = "skills"
     id = Column(Integer, primary_key=True, nullable=False)
-    created_at = Column(Integer, default=time.time())
+    created_at = Column(Float, default=time.time())
     path = Column(String)
     name = Column(String)
     folder = Column(String)
@@ -263,7 +261,7 @@ class Skill(Base):
 
 class IPAddress(Base):
     __tablename__ = "ips"
-    created_at = Column(Integer, default=time.time())
+    created_at = Column(Float, default=time.time())
     ip_address = Column(String, primary_key=True, nullable=False)
     last_seen = Column(Integer, default=0)
 
@@ -278,7 +276,7 @@ class IPAddress(Base):
 
 class Location(Base):
     __tablename__ = "locations"
-    created_at = Column(Integer, default=time.time())
+    created_at = Column(Float, default=time.time())
     id = Column(Integer, primary_key=True, nullable=False)
     last_seen = Column(Integer, default=1)
     city = Column(String)
@@ -314,7 +312,7 @@ class Configuration(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     device_id = Column(Integer, ForeignKey("devices.uuid"), nullable=False)
 
-    created_at = Column(String, default=time.time())
+    created_at = Column(Float, default=time.time())
 
     device = relationship("Device", back_populates="config",
                           secondary=config_devices, uselist=False)
@@ -543,10 +541,6 @@ class DeviceDatabase(object):
             self.session = Session()
         Base.metadata.create_all(self.db)
 
-    def get_user_by_pairing_code(self, pairing_code):
-        return self.session.query(User).filter(
-            User.pairing_code == pairing_code).first()
-
     def get_user_by_id(self, user_id):
         return self.session.query(User).filter(User.id == user_id).first()
 
@@ -558,6 +552,11 @@ class DeviceDatabase(object):
                                                    uuid).first()
         if device is not None:
             return device.user
+
+    def get_metrics_by_username(self, username):
+        user = self.session.query(User).filter(User.name == username).first()
+        if user is not None:
+            return user.metrics
 
     def get_device_by_uuid(self, uuid):
         return self.session.query(Device).filter(Device.uuid == uuid).first()
@@ -630,6 +629,15 @@ class DeviceDatabase(object):
             if password:
                 user.password = password
         return self.commit()
+
+    def add_metric(self, name, uuid, data=None):
+        data = data or "{}"
+        if isinstance(data, dict):
+            data = json.dumps(data)
+        metric = Metric(name=name, json=data, id=self.total_metrics() + 1)
+        device = self.get_device_by_uuid(uuid)
+        metric.device = device
+        metric.user = device.user
 
     def add_unpaired_device(self, uuid, code):
         device = UnpairedDevice(uuid=uuid, code=code)
@@ -735,6 +743,9 @@ class DeviceDatabase(object):
             device.refreshToken = refreshToken
 
         return self.commit()
+
+    def total_metrics(self):
+        return self.session.query(Metric).count()
 
     def total_users(self):
         return self.session.query(User).count()

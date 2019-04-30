@@ -257,12 +257,14 @@ def get_device_routes(app, mail_sender):
     @requires_auth
     def metric(uuid="", name=""):
         data = request.json
-        print(name, data)
         with DeviceDatabase(SQL_DEVICES_URI, debug=DEBUG) as device_db:
             device = device_db.get_device_by_uuid(uuid)
             if device is None:
-                return
+                return Response(
+                    'Could not find device uuid, NOT PAIRED', 401,
+                    {'WWW-Authenticate': 'Basic realm="NOT PAIRED"'})
             device_db.add_metric(name=name, uuid=uuid, data=data)
+        return Response('Metric submited', 200)
 
     @app.route("/" + API_VERSION + "/device/<uuid>/subscription",
                methods=['GET'])
