@@ -167,6 +167,42 @@ def get_routes(app, mail_sender):
                 if utils.pair(code, mail_sender):
                     status = "Paired"
             return json.dumps({'status': status})
-        return render_template('devices.html', form=form)
+        return render_template('pair.html', form=form)
+
+    @app.route('/devices', methods=['GET'])
+    @noindex
+    @donation
+    @requires_auth
+    @check_confirmed
+    def devices():
+        devices = utils.get_devices_json()
+        return render_template('devices.html', devices=devices)
+
+    @app.route('/config', methods=['GET'])
+    @noindex
+    @donation
+    @requires_auth
+    @check_confirmed
+    def all_configs():
+        configs = utils.get_configs_json()
+        return render_template('config.html', configs=configs)
+
+    @app.route('/config/<uuid>', methods=['GET'])
+    @noindex
+    @donation
+    @requires_auth
+    @check_confirmed
+    def config(uuid):
+        configs = utils.get_configs_json(uuid)
+        return render_template('config.html', configs=configs)
+
+    @app.route('/location/<uuid>', methods=['GET'])
+    @noindex
+    @donation
+    @requires_auth
+    @check_confirmed
+    def location(uuid):
+        locations = utils.get_location_json(uuid)
+        return render_template('location.html', locations=locations)
 
     return app

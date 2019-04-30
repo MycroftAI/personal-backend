@@ -26,7 +26,7 @@ def check_confirmed(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
         user = get_user()
-        if user.confirmed is False:
+        if user is None or user.confirmed is False:
             flash('Please confirm your account!')
             return redirect(url_for('unconfirmed'))
         return func(*args, **kwargs)

@@ -1,0 +1,42 @@
+{% extends "navbar.html" %}
+{% block content %}
+<title>Personal Mycroft Backend</title>
+<section class="hero is-primary is-bold is-small">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <div id="pair" class="pair-box">
+        <div class="pair-area">
+          <h1 class="title">Pair a device</h1>
+          <div class="field">
+            <p class="control has-icons-left">
+
+              <input id="devices-name" class="input is-success" type="text"
+                     placeholder="name your device">
+              <span class="icon is-small is-left">
+                <i class="fa fa-laptop"></i>
+              </span>
+            </p>
+          </div>
+          <div class="field">
+            <p class="control has-icons-left">
+              <input id="devices-code" class="input is-success" type="text"
+                     placeholder="PAIRING_CODE">
+              <span class="icon is-small is-left">
+                <i class="fa fa-id-card"></i>
+              </span>
+            </p>
+          </div>
+          <br>
+          <a id="pair"
+             class="form-button button is-primary is-inverted is-outlined">
+            <span>Pair</span>
+          </a>
+          <br>
+          <br>
+          <i><a id="feedback" class="feedback"></a></i>
+        </div>
+      </div>    
+    </div>
+  </div>
+</section>
+{% endblock %}
