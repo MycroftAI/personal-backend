@@ -4,12 +4,12 @@
     <section class="hero is-primary is-bold is-small">
         <div class="hero-body">
             <div class="container has-text-centered">
-                <div id="devices" class="devices-box">
-                    <div class="devices-area">
-                        <h1 class="title">Devices</h1>
-                        {% for device in devices %}
+                <div id="location" class="location-box">
+                    <div class="location-area">
+                        <h1 class="title">Location</h1>
+                        {% for location in locations %}
                             <table>
-                                {% for key, value in device.items() %}
+                                {% for key, value in location.items() %}
                                     <tr>
                                         <th> {{ key }} </th>
                                         <td> {{ value }} </td>

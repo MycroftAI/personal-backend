@@ -26,7 +26,8 @@ from smtplib import SMTPRecipientsRefused
 from personal_mycroft_backend.settings import SECURITY_PASSWORD_SALT, \
     SECRET_KEY, MAIL_DEFAULT_SENDER, DEBUG
 from personal_mycroft_backend.database.users import *
-from personal_mycroft_backend.database.devices import DeviceDatabase
+from personal_mycroft_backend.database.devices import DeviceDatabase, Device
+from personal_mycroft_backend.database import model_to_dict
 
 
 @contextmanager
@@ -55,11 +56,78 @@ def get_user():
         return user
 
 
-def get_device():
+def get_devices():
     username = session['username']
-    # TODO
-    return None
+    with session_scope() as s:
+        user = s.query(User).filter(User.name.in_([username])).one()
+        if user is not None:
+            return user.devices
+    return []
 
+
+def get_devices_json():
+    username = session['username']
+    with session_scope() as s:
+        user = s.query(User).filter(User.name.in_([username])).one()
+        if user is not None:
+            return [model_to_dict(d) for d in user.devices]
+    return []
+
+
+def get_configs(uuid=None):
+    username = session['username']
+    with session_scope() as s:
+        if uuid:
+            device = s.query(Device).filter(Device.uuid == uuid).first()
+            return [device.config] or []
+
+        else:
+            user = s.query(User).filter(User.name.in_([username])).one()
+            if user is not None:
+                return user.devices
+    return []
+
+
+def get_configs_json(uuid=None):
+    username = session['username']
+    with session_scope() as s:
+        if uuid:
+            device = s.query(Device).filter(Device.uuid == uuid).first()
+            return [device.config.as_dict] or []
+
+        else:
+            user = s.query(User).filter(User.name.in_([username])).one()
+            if user is not None:
+                return [c.as_dict for c in user.configs]
+    return []
+
+
+def get_location(uuid=None):
+    username = session['username']
+    with session_scope() as s:
+        if uuid:
+            device = s.query(Device).filter(Device.uuid == uuid).first()
+            return [device.location] or []
+
+        else:
+            user = s.query(User).filter(User.name.in_([username])).one()
+            if user is not None:
+                return user.locations
+    return []
+
+
+def get_location_json(uuid=None):
+    username = session['username']
+    with session_scope() as s:
+        if uuid:
+            device = s.query(Device).filter(Device.uuid == uuid).first()
+            return [model_to_dict(device.location)] or []
+
+        else:
+            user = s.query(User).filter(User.name.in_([username])).one()
+            if user is not None:
+                return [c.as_dict for c in user.locations]
+    return []
 
 def add_user(username, password, email, mail_sender):
     token = generate_confirmation_token(email)

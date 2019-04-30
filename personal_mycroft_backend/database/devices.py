@@ -17,119 +17,131 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Text, \
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.exc import IntegrityError
 
-from personal_mycroft_backend.database import Base
+from personal_mycroft_backend.database import Base, props, model_to_dict
 import json
 import time
-from personal_mycroft_backend.database import props
 from os.path import join, expanduser, exists
 from os import makedirs
-
 
 ## association tables
 
 
 user_devices = Table('user_devices', Base.metadata,
-     Column('user_id', ForeignKey('users.id'), primary_key=True),
-     Column('device_id', ForeignKey('devices.uuid'), primary_key=True)
-)
-
+                     Column('user_id', ForeignKey('users.id'),
+                            primary_key=True),
+                     Column('device_id', ForeignKey('devices.uuid'),
+                            primary_key=True)
+                     )
 
 config_devices = Table('config_devices', Base.metadata,
-     Column('config_id', ForeignKey('configs.id'), primary_key=True),
-     Column('device_id', ForeignKey('devices.uuid'), primary_key=True)
-)
-
+                       Column('config_id', ForeignKey('configs.id'),
+                              primary_key=True),
+                       Column('device_id', ForeignKey('devices.uuid'),
+                              primary_key=True)
+                       )
 
 config_users = Table('config_users', Base.metadata,
-     Column('config_id', ForeignKey('configs.id'), primary_key=True),
-     Column('user_id', ForeignKey('users.id'), primary_key=True)
-)
-
+                     Column('config_id', ForeignKey('configs.id'),
+                            primary_key=True),
+                     Column('user_id', ForeignKey('users.id'),
+                            primary_key=True)
+                     )
 
 ip_devices = Table('ip_devices', Base.metadata,
-     Column('ip_address', ForeignKey('ips.ip_address'), primary_key=True),
-     Column('device_id', ForeignKey('devices.uuid'), primary_key=True)
-)
-
+                   Column('ip_address', ForeignKey('ips.ip_address'),
+                          primary_key=True),
+                   Column('device_id', ForeignKey('devices.uuid'),
+                          primary_key=True)
+                   )
 
 ip_users = Table('ip_users', Base.metadata,
-     Column('ip_address', ForeignKey('ips.ip_address'), primary_key=True),
-     Column('user_id', ForeignKey('users.id'), primary_key=True)
-)
-
+                 Column('ip_address', ForeignKey('ips.ip_address'),
+                        primary_key=True),
+                 Column('user_id', ForeignKey('users.id'), primary_key=True)
+                 )
 
 location_devices = Table('location_devices', Base.metadata,
-     Column('location_id', ForeignKey('locations.id'), primary_key=True),
-     Column('device_id', ForeignKey('devices.uuid'), primary_key=True)
-)
-
+                         Column('location_id', ForeignKey('locations.id'),
+                                primary_key=True),
+                         Column('device_id', ForeignKey('devices.uuid'),
+                                primary_key=True)
+                         )
 
 location_users = Table('location_users', Base.metadata,
-     Column('location_id', ForeignKey('locations.id'), primary_key=True),
-     Column('user_id', ForeignKey('users.id'), primary_key=True)
-)
-
+                       Column('location_id', ForeignKey('locations.id'),
+                              primary_key=True),
+                       Column('user_id', ForeignKey('users.id'),
+                              primary_key=True)
+                       )
 
 location_configs = Table('location_configs', Base.metadata,
-     Column('location_id', ForeignKey('locations.id'),  primary_key=True),
-     Column('config_id', ForeignKey('configs.id'), primary_key=True)
-)
-
+                         Column('location_id', ForeignKey('locations.id'),
+                                primary_key=True),
+                         Column('config_id', ForeignKey('configs.id'),
+                                primary_key=True)
+                         )
 
 skill_devices = Table('skill_devices', Base.metadata,
-     Column('skill_id', ForeignKey('skills.id'), primary_key=True),
-     Column('device_id', ForeignKey('devices.uuid'), primary_key=True)
-)
-
+                      Column('skill_id', ForeignKey('skills.id'),
+                             primary_key=True),
+                      Column('device_id', ForeignKey('devices.uuid'),
+                             primary_key=True)
+                      )
 
 skill_configs = Table('skill_configs', Base.metadata,
-     Column('skill_id', ForeignKey('skills.id'), primary_key=True),
-     Column('config_id', ForeignKey('configs.id'), primary_key=True)
-)
-
+                      Column('skill_id', ForeignKey('skills.id'),
+                             primary_key=True),
+                      Column('config_id', ForeignKey('configs.id'),
+                             primary_key=True)
+                      )
 
 metrics_users = Table('metrics_users', Base.metadata,
-    Column('metric_id', Integer, ForeignKey('metrics.id')),
-    Column('user_id', Integer, ForeignKey('users.id'))
-)
+                      Column('metric_id', Integer, ForeignKey('metrics.id')),
+                      Column('user_id', Integer, ForeignKey('users.id'))
+                      )
 
 metrics_devices = Table('metrics_devices', Base.metadata,
-    Column('metric_id', Integer, ForeignKey('metrics.id')),
-    Column('device_id', Integer, ForeignKey('devices.uuid'))
-)
+                        Column('metric_id', Integer, ForeignKey('metrics.id')),
+                        Column('device_id', Integer,
+                               ForeignKey('devices.uuid'))
+                        )
 
 hotword_configs = Table('hotword_configs', Base.metadata,
-   Column('hotword_id', Integer, ForeignKey('hotwords.id')),
-   Column('config_id', Integer, ForeignKey('configs.id'))
+                        Column('hotword_id', Integer,
+                               ForeignKey('hotwords.id')),
+                        Column('config_id', Integer, ForeignKey('configs.id'))
 
-   )
+                        )
 
 hotword_devices = Table('hotword_devices', Base.metadata,
-   Column('hotword_id', Integer, ForeignKey('hotwords.id')),
-   Column('device_id', Integer, ForeignKey('devices.uuid'))
+                        Column('hotword_id', Integer,
+                               ForeignKey('hotwords.id')),
+                        Column('device_id', Integer,
+                               ForeignKey('devices.uuid'))
 
-   )
+                        )
 
 hotword_users = Table('hotword_users', Base.metadata,
-   Column('hotword_id', Integer, ForeignKey('hotwords.id')),
-   Column('user_id', Integer, ForeignKey('users.id'))
+                      Column('hotword_id', Integer, ForeignKey('hotwords.id')),
+                      Column('user_id', Integer, ForeignKey('users.id'))
 
-   )
+                      )
 
 config_stt = Table('config_stt', Base.metadata,
-    Column('config_id', Integer, ForeignKey('configs.id')),
-    Column('stt_id', Integer, ForeignKey('stt_engines.id'))
-)
+                   Column('config_id', Integer, ForeignKey('configs.id')),
+                   Column('stt_id', Integer, ForeignKey('stt_engines.id'))
+                   )
 
 config_tts = Table('config_tts', Base.metadata,
-    Column('config_id', Integer, ForeignKey('configs.id')),
-    Column('tts_id', Integer, ForeignKey('tts_engines.id'))
-)
+                   Column('config_id', Integer, ForeignKey('configs.id')),
+                   Column('tts_id', Integer, ForeignKey('tts_engines.id'))
+                   )
 
 config_sounds = Table('config_sounds', Base.metadata,
-    Column('config_id', Integer, ForeignKey('configs.id')),
-    Column('sound_id', Integer, ForeignKey('sounds.id'))
-)
+                      Column('config_id', Integer, ForeignKey('configs.id')),
+                      Column('sound_id', Integer, ForeignKey('sounds.id'))
+                      )
+
 
 # classes
 
@@ -154,13 +166,14 @@ class User(Base):
     mail = Column(String, nullable=False, unique=True)
     last_seen = Column(Integer, default=0)
 
-    devices = relationship("Device", back_populates="user", secondary=user_devices)
+    devices = relationship("Device", back_populates="user",
+                           secondary=user_devices)
     configs = relationship("Configuration", back_populates="user",
-                         secondary=config_users)
+                           secondary=config_users)
     ips = relationship("IPAddress", back_populates="users",
-                           secondary=ip_users)
+                       secondary=ip_users)
     locations = relationship("Location", back_populates="user",
-                       secondary=location_users)
+                             secondary=location_users)
     metrics = relationship("Metric", back_populates="user",
                            secondary=metrics_users)
     hotwords = relationship("Hotword", back_populates="user",
@@ -188,9 +201,9 @@ class Device(Base):
                         secondary=user_devices, uselist=False)
 
     config = relationship("Configuration", back_populates="device",
-                           secondary=config_devices, uselist=False)
+                          secondary=config_devices, uselist=False)
 
-    ips = relationship("IPAddress", # order_by="ips.last_seen",
+    ips = relationship("IPAddress",  # order_by="ips.last_seen",
                        back_populates="devices",
                        secondary=ip_devices)
 
@@ -224,9 +237,9 @@ class Metric(Base):
     source = Column(String)
 
     device = relationship("Device", back_populates="metrics",
-                           secondary=metrics_devices)
+                          secondary=metrics_devices)
     user = relationship("User", back_populates="metrics",
-                         secondary=metrics_users)
+                        secondary=metrics_users)
 
 
 class Skill(Base):
@@ -237,9 +250,9 @@ class Skill(Base):
     name = Column(String)
     folder = Column(String)
     github = Column(String)
-    device = relationship("Device", #order_by="devices.last_seen",
-                           back_populates="skills",
-                           secondary=skill_devices, uselist=False)
+    device = relationship("Device",  # order_by="devices.last_seen",
+                          back_populates="skills",
+                          secondary=skill_devices, uselist=False)
     config = relationship("Configuration",
                           back_populates="skills",
                           secondary=skill_configs, uselist=False)
@@ -278,14 +291,21 @@ class Location(Base):
     timezone = Column(String)
 
     user = relationship("User",
-                         back_populates="locations", uselist=False,
-                         secondary=location_users)
+                        back_populates="locations", uselist=False,
+                        secondary=location_users)
     device = relationship("Device",
-                           back_populates="location",
-                           secondary=location_devices, uselist=False)
+                          back_populates="location",
+                          secondary=location_devices, uselist=False)
     config = relationship("Configuration",
                           back_populates="location",
                           secondary=location_configs, uselist=False)
+
+    @property
+    def as_dict(self):
+        # this is a placeholder
+        # TODO generate proper config matching mycroft.conf
+        bucket = model_to_dict(self)
+        return bucket
 
 
 class Configuration(Base):
@@ -297,8 +317,9 @@ class Configuration(Base):
     created_at = Column(String, default=time.time())
 
     device = relationship("Device", back_populates="config",
-                           secondary=config_devices, uselist=False)
-    user = relationship("User", back_populates="configs", secondary=config_users, uselist=False)
+                          secondary=config_devices, uselist=False)
+    user = relationship("User", back_populates="configs",
+                        secondary=config_users, uselist=False)
     location = relationship("Location", back_populates="config",
                             secondary=location_configs, uselist=False)
     skills = relationship("Skill", back_populates="config",
@@ -335,6 +356,69 @@ class Configuration(Base):
     wake_word = Column(String, default="hey mycroft")
     stand_up_word = Column(String, default="wake up")
 
+    @property
+    def listener_as_dict(self):
+        # this is a placeholder
+        # TODO generate proper config matching mycroft.conf
+        bucket = {
+            "wake_word": self.wake_word,
+            "stand_up_word": self.stand_up_word,
+            "record_wakewords": self.record_wake_words,
+            "record_utterances": self.record_utterances,
+            "confirm_listening": self.confirm_listening,
+            "wake_word_upload": self.wake_word_upload,
+            "sample_rate": self.listener_sample_rate,
+            "channels": self.listener_channels,
+            "energy_ratio": self.listener_energy_ratio,
+            "multiplier": self.listener_multiplier
+        }
+        return bucket
+
+    @property
+    def skills_as_dict(self):
+        # this is a placeholder
+        # TODO generate proper config matching mycroft.conf
+        bucket = {
+            "directory": self.skills_dir,
+            "auto_update": self.skills_auto_update,
+            "blacklisted_skills": [s.folder for s in self.skills if
+                                   s.blacklisted],
+            "priority_skills": [s.folder for s in self.skills if s.priority]
+        }
+        return bucket
+
+    @property
+    def hotwords_as_dict(self):
+        # this is a placeholder
+        # TODO generate proper config matching mycroft.conf
+        return [model_to_dict(h) for h in self.hotwords]
+
+    @property
+    def sounds_as_dict(self):
+        # this is a placeholder
+        # TODO generate proper config matching mycroft.conf
+        return [model_to_dict(h) for h in self.sounds]
+
+    @property
+    def as_dict(self):
+        # this is a placeholder
+        # TODO generate proper config matching mycroft.conf
+        bucket = {
+            "lang": self.lang,
+            "opt_in": self.opt_in,
+            "system_unit": self.system_unit,
+            "time_format": self.time_format,
+            "date_format": self.date_format,
+            "listener": self.listener_as_dict,
+            "skills": self.skills_as_dict,
+            "location": self.location.as_dict,
+            "tts": self.tts.as_dict,
+            "stt": self.stt.as_dict,
+            "hotwords": self.hotwords_as_dict,
+            "sounds": self.sounds_as_dict
+        }
+        return bucket
+
 
 class Hotword(Base):
     __tablename__ = "hotwords"
@@ -356,6 +440,13 @@ class Hotword(Base):
     config = relationship("Configuration", back_populates="hotwords",
                           secondary=hotword_configs, uselist=False)
 
+    @property
+    def as_dict(self):
+        # this is a placeholder
+        # TODO generate proper config matching mycroft.conf
+        bucket = model_to_dict(self)
+        return bucket
+
 
 class Sound(Base):
     __tablename__ = "sounds"
@@ -364,6 +455,13 @@ class Sound(Base):
     name = Column(String, default="")
     config = relationship("Configuration", back_populates="sounds",
                           secondary=config_sounds, uselist=False)
+
+    @property
+    def as_dict(self):
+        # this is a placeholder
+        # TODO generate proper config matching mycroft.conf
+        bucket = model_to_dict(self)
+        return bucket
 
 
 class STT(Base):
@@ -381,6 +479,19 @@ class STT(Base):
     config = relationship("Configuration", back_populates="stt",
                           secondary=config_stt, uselist=False)
 
+    @property
+    def as_dict(self):
+        # this is a placeholder
+        # TODO generate proper config matching mycroft.conf
+        bucket = {"module": self.name}
+        self_dict = model_to_dict(self)
+        for k in self_dict:
+            if k in ["engine_type", "name", "id"]:
+                continue
+            if self_dict[k]:
+                bucket[k] = self_dict[k]
+        return bucket
+
 
 class TTS(Base):
     __tablename__ = "tts_engines"
@@ -395,11 +506,24 @@ class TTS(Base):
     client_key = Column(String, default="")
     client_id = Column(String, default="")
     voice = Column(String, default="")
-    gender = Column(String, default="male")
+    gender = Column(String, default="")
     api_key = Column(String)
 
     config = relationship("Configuration", back_populates="tts",
                           secondary=config_tts, uselist=False)
+
+    @property
+    def as_dict(self):
+        # this is a placeholder
+        # TODO generate proper config matching mycroft.conf
+        bucket = {"module": self.name}
+        self_dict = model_to_dict(self)
+        for k in self_dict:
+            if k in ["engine_type", "name", "id"]:
+                continue
+            if self_dict[k]:
+                bucket[k] = self_dict[k]
+        return bucket
 
 
 class DeviceDatabase(object):
