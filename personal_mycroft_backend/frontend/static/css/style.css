@@ -7,6 +7,10 @@
   height: 35px;
 }
 
+.form-button-no-width {
+  height: 35px;
+}
+
 .signup-box {
   margin: auto;
   width: 325px;

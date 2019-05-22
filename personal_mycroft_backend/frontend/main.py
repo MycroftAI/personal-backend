@@ -18,7 +18,7 @@ import json
 import time
 from os.path import join
 from personal_mycroft_backend.frontend import utils
-from personal_mycroft_backend.frontend.forms import LoginForm, PairingForm
+from personal_mycroft_backend.frontend.forms import LoginForm, PairingForm, EmailForm, PasswordForm
 from personal_mycroft_backend.frontend.decorators import noindex, donation, \
     check_confirmed, requires_auth
 
@@ -204,5 +204,65 @@ def get_routes(app, mail_sender):
     def location(uuid):
         locations = utils.get_location_json(uuid)
         return render_template('location.html', locations=locations)
+    
+    @app.route('/resetpage', methods=["GET", "POST"])
+    @noindex
+    def resetpage():
+        form = EmailForm(request.form)
+        return render_template('password_reset_email.html', form=form)
 
+    @app.route('/reset', methods=["GET", "POST"])
+    @noindex
+    @donation
+    def reset():
+        form = EmailForm(request.form)
+        try:
+            userid = request.form['username']
+        except:
+            print('Invalid user or user does not exist!', 'error')
+            return render_template('password_reset_email.html', form=form)
+
+        user = utils.get_user_email(userid)
+        try:
+            email = request.form['email']
+        except:
+            print('Invalid email address!', 'error')
+            return render_template('password_reset_email.html', form=form)
+        
+        if user and user.confirmed:
+            utils.send_password_reset_email(user.mail, userid, mail_sender)
+            return render_template('reset_password_link_sent.html')
+        else:
+            print('Your email address must be confirmed before attempting a password reset.', 'error')
+            return render_template('unconfirmed.html')
+ 
+        return render_template('password_reset_email.html', form=form)
+    
+    @app.route('/resetpassword/<token>/<username>', methods=["GET", "POST"])
+    @noindex
+    @donation
+    def resetpassword(token, username):
+        form = PasswordForm(request.form)
+        try:
+            validity = utils.check_password_reset_token(token)
+        except:
+            print('The password reset link is invalid or has expired.', 'error')
+            return render_template('reset_password_token_error.html')
+        return render_template('reset_password_with_token.html', form=form, token=token, username=username)
+
+    @app.route('/resetresult/<token>/<username>', methods=["GET", "POST"])
+    @noindex
+    @donation
+    def resetresult(token, username):
+        form = PasswordForm(request.form)
+        password = form.data["password"]
+        setpassword = utils.set_password_on_reset(username, password)
+        if setpassword:
+            print('Your password has been updated!', 'success')
+            return render_template('reset_success.html')
+        else:
+            print("fail")
+            return render_template('reset_fail.html')
+        return render_template('reset_password_with_token.html', form=form, token=token, username=username)
+            
     return app

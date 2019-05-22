@@ -55,6 +55,11 @@ def get_user():
         user = s.query(User).filter(User.name.in_([username])).first()
         return user
 
+def get_user_email(userid):
+    username = userid
+    with session_scope() as s:
+        user = s.query(User).filter(User.name.in_([username])).first()
+        return user
 
 def get_devices():
     username = session['username']
@@ -168,7 +173,7 @@ def credentials_valid(username, password):
     with session_scope() as s:
         user = s.query(User).filter(User.name.in_([username])).first()
         if user:
-            return bcrypt.checkpw(password.encode('utf8'), user.password)
+            return bcrypt.checkpw(password.encode('utf8', 'ignore'), user.password.encode('utf8'))
         else:
             return False
 
@@ -223,3 +228,34 @@ def send_confirmation_mail(to, subject, template, mail_sender):
         sender=MAIL_DEFAULT_SENDER
     )
     mail_sender.send(msg)
+    
+def send_email(to, subject, template, mail_sender):
+    msg = Message(
+        subject, 
+        recipients=[to],
+        html=template,
+        sender=MAIL_DEFAULT_SENDER
+    )
+    mail_sender.send(msg)
+
+def send_password_reset_email(email, userid, mail_sender):
+    password_reset_serializer = URLSafeTimedSerializer(SECRET_KEY)
+    password_reset_url = url_for('resetpassword', token = password_reset_serializer.dumps(email, salt="password-reset-salt"), username=userid, _external=True)
+    html = render_template('email_password_reset.html', password_reset_url=password_reset_url)
+    subject = "Password Reset Confirmation Email"
+    send_email(email, subject, html, mail_sender)
+
+def check_password_reset_token(token):
+    password_reset_serializer = URLSafeTimedSerializer(SECRET_KEY)
+    validToken = password_reset_serializer.loads(token, salt="password-reset-salt", max_age=3600)
+    return validToken
+
+def set_password_on_reset(username, password):
+    with session_scope() as s:
+        user = s.query(User).filter(User.name.in_([username])).first()
+        try:
+            user.password = hash_password(password)
+            s.commit()
+            return True
+        except:
+            return False
