@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Text, \
-    Table, Float, create_engine
+    Table, Float, Unicode, create_engine
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.exc import IntegrityError
 
@@ -88,6 +88,13 @@ skill_devices = Table('skill_devices', Base.metadata,
                              primary_key=True)
                       )
 
+skill_info_devices = Table('skill_info_devices', Base.metadata,
+                           Column('skill_id', ForeignKey('skillinfo.identifier'),
+                                  primary_key=True),
+                           Column('device_id', ForeignKey('devices.uuid'),
+                                  primary_key=True)
+                           )
+
 skill_configs = Table('skill_configs', Base.metadata,
                       Column('skill_id', ForeignKey('skills.id'),
                              primary_key=True),
@@ -141,6 +148,8 @@ config_sounds = Table('config_sounds', Base.metadata,
                       Column('config_id', Integer, ForeignKey('configs.id')),
                       Column('sound_id', Integer, ForeignKey('sounds.id'))
                       )
+
+
 
 
 # classes
@@ -213,11 +222,26 @@ class Device(Base):
     skills = relationship("Skill", back_populates="device",
                           secondary=skill_devices)
 
+    skills_info = relationship("SkillInfo",
+                               back_populates="device",
+                               secondary=skill_info_devices)
+
     metrics = relationship("Metric", back_populates="device",
                            secondary=metrics_devices)
 
     hotwords = relationship("Hotword", back_populates="device",
                             secondary=hotword_devices)
+
+    @property
+    def as_dict(self):
+        bucket = model_to_dict(self)
+        bucket['location'] = model_to_dict(self.location)
+        bucket['user'] = model_to_dict(self.user)
+        bucket['setting'] = model_to_dict(self.config)
+        # TODO: check API definition document
+        bucket['user']['uuid'] = self.user.id
+        return bucket
+
 
 
 class Metric(Base):
@@ -259,6 +283,40 @@ class Skill(Base):
 
     priority = Column(Boolean, default=False)
     blacklisted = Column(Boolean, default=False)
+
+
+class SkillInfo(Base):
+    __tablename__ = "skillinfo"
+    identifier = Column(String, primary_key=True, nullable=False)
+    name = Column(String)
+    description = Column(String)
+    contributor = Column(String)
+    display_name = Column(String)
+    color = Column(String)
+    skill_gid = Column(String)
+    icon = Column(String)
+    skillMetadata = Column(String)
+
+    device = relationship("Device",  # order_by="devices.last_seen",
+                          back_populates="skills_info",
+                          secondary=skill_info_devices, uselist=False)
+
+    @property
+    def as_dict(self):
+        # this is a placeholder
+        bucket = {
+            'identifier': str(self.identifier),
+            'name': str(self.name),
+            'description': str(self.description),
+            'contributor': str(self.contributor),
+            'icon': str(self.icon),
+            'display_name': str(self.display_name),
+            'color': str(self.color),
+            'skill_gid': str(self.skill_gid),
+        }
+        if self.skillMetadata is not None and len(self.skillMetadata) > 0:
+            bucket['skillMetadata'] = json.loads(str(self.skillMetadata))
+        return bucket
 
 
 class IPAddress(Base):
@@ -570,6 +628,9 @@ class DeviceDatabase(object):
                                                        token).first()
         return device
 
+    def get_skill_info_by_id(self, skill_id):
+        return self.session.query(SkillInfo).filter(SkillInfo.identifier == skill_id).first()
+
     def add_location(self, uuid, location_data=None):
         device = self.get_device_by_uuid(uuid)
         if device is None:
@@ -734,6 +795,37 @@ class DeviceDatabase(object):
         if refreshToken:
             device.refreshToken = refreshToken
 
+        return self.commit()
+
+    def add_skill_info(self, uuid, skill_info_data):
+        device = self.get_device_by_uuid(uuid)
+        if device is None:
+            return False
+        skill_id = skill_info_data['identifier']
+        skill = self.get_skill_info_by_id(str(skill_id))
+        if skill is None:
+            skill_info = SkillInfo(identifier=str(skill_info_data['identifier']),
+                                   name=str(skill_info_data.get('name', u'')),
+                                   description=str(skill_info_data.get('description', u'')),
+                                   contributor=str(skill_info_data.get('contributor', u'')),
+                                   display_name=str(skill_info_data.get('display_name', u'')),
+                                   color=str(skill_info_data.get('color', u'')),
+                                   skill_gid=str(skill_info_data.get('skill_gid', u'')),
+                                   icon=str(skill_info_data.get('icon', u'')),
+                                   skillMetadata=str(skill_info_data.get('skillMetadata', u''))
+                                   )
+            skill_info.device = device
+            device.skills_info.append(skill_info)
+            self.session.add(skill_info)
+        else:
+            skill.name = str(skill_info_data.get('name', '')).encode('utf8')
+            skill.description = str(skill_info_data.get('description', u''))
+            skill.contributor = str(skill_info_data.get('contributor', u''))
+            skill.display_name = str(skill_info_data.get('display_name', u''))
+            skill.color = str(skill_info_data.get('color', u''))
+            skill.skill_gid = str(skill_info_data.get('skill_gid', u''))
+            skill.icon = str(skill_info_data.get('icon', u''))
+            skill.skillMetadata = str(skill_info_data.get('skillMetadata', u''))
         return self.commit()
 
     def total_users(self):
