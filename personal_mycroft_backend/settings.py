@@ -47,11 +47,8 @@ if not SSL_CERT or not SSL_KEY:
                                                 "MycroftPersonalServer")
 
 # PERSONAL SERVER
-API_VERSION = conf.get("api_version", "v0.1")
+API_VERSION = conf.get("api_version", "v1")
 BACKEND_PORT = conf.get("backend_port", 6712)
-WEBSITE_PORT = conf.get("website_port", 5000)
-SECRET_KEY = conf.get("secret_key", 'MY_PRECIOUS_SECRET_KEY')
-SECURITY_PASSWORD_SALT = conf.get("salt", 'MY_TABLE_SALT')
 
 # EMAIL
 MAIL_SERVER = conf.get("mail_server", 'smtp.googlemail.com')
@@ -66,14 +63,12 @@ STT_CONFIG = conf.get("stt") or {"module": "google", "google": {}}
 
 LANG = conf.get("lang", "en-us")
 
+
 def create_conf_file():
     default_conf = {
         "lang": LANG,
         "stt": STT_CONFIG,
         "backend_port": BACKEND_PORT,
-        "website_port": WEBSITE_PORT,
-        "secret_key": SECRET_KEY,
-        "salt": SECURITY_PASSWORD_SALT,
         "ssl": SSL,
         "ssl_cert": SSL_CERT,
         "ssl_key": SSL_KEY,
