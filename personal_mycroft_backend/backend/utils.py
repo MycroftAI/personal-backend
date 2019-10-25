@@ -14,10 +14,9 @@
 #
 from flask import make_response
 
-import requests
 import random
 import base64
-import pygeoip
+import geoip2.database
 import json
 from os import makedirs, urandom
 from os.path import exists, join, dirname
@@ -90,16 +89,10 @@ def nice_json(arg):
 
 
 def geo_locate(ip):
-    if ip in ["0.0.0.0", "127.0.0.1"]:
-        response = requests.get("https://ipapi.co/json/")
-        data = response.json()
-        data["country_code"] = data["country"]
-    else:
-        g = pygeoip.GeoIP(join(root_dir(), 'database',
-                                       'GeoLiteCity.dat'))
-        data = g.record_by_addr(ip) or {}
+    ip_database = geoip2.database.Reader(join(root_dir(), 'database', 'GeoLite2-City.mmdb'))
 
-    return data
+    data = ip_database.city(ip)
+    return data.raw
 
 
 def location_dict(city="", region_code="", country_code="",
