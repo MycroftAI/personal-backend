@@ -15,7 +15,7 @@
 from flask_mail import Message
 from flask import request, Response
 
-from personal_mycroft_backend.backend.utils import geo_locate, \
+from personal_mycroft_backend.utils import geo_locate, \
     generate_code, location_dict, nice_json, gen_api
 from personal_mycroft_backend.settings import API_VERSION, DEBUG, SQL_DEVICES_URI
 from personal_mycroft_backend.backend.decorators import noindex, donation, requires_auth
@@ -42,7 +42,7 @@ def get_device_routes(app, mail_sender):
                     # TODO http://esd.io/blog/flask-apps-heroku-real-ip-spoofing.html
                     ip = request.headers.getlist("X-Forwarded-For")[0]
                 device_db.add_ip(uuid, ip)
-                new_location = location_dict(**geo_locate(ip))
+                new_location = geo_locate(ip)
                 device_db.add_location(uuid, new_location)
                 return nice_json(new_location)
             location = device.location

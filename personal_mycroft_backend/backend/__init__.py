@@ -21,14 +21,12 @@ from personal_mycroft_backend.settings import *
 
 def create_app():
     app = Flask(__name__)
-    app.config["SECRET_KEY"] = SECRET_KEY
-    app.config['SECURITY_PASSWORD_SALT'] = SECURITY_PASSWORD_SALT
 
     mail = Mail(app)
     if SSL:
         sslify = SSLify(app)
 
-    from personal_mycroft_backend.backend.utils import nice_json
+    from personal_mycroft_backend.utils import nice_json
     from personal_mycroft_backend.backend.decorators import noindex, donation
 
     from personal_mycroft_backend.backend.auth import get_auth_routes

@@ -14,7 +14,7 @@
 #
 
 from personal_mycroft_backend.backend import API_VERSION, DEBUG, SQL_DEVICES_URI
-from personal_mycroft_backend.backend.utils import nice_json, gen_api
+from personal_mycroft_backend.utils import nice_json, gen_api
 from personal_mycroft_backend.backend.decorators import noindex, donation, requires_admin
 from personal_mycroft_backend.database import model_to_dict
 from personal_mycroft_backend.database.devices import DeviceDatabase

@@ -15,7 +15,7 @@
 import time
 from functools import wraps
 from flask import make_response, request, Response
-from personal_mycroft_backend.settings import API_VERSION, DEBUG, SQL_DEVICES_URI, \
+from personal_mycroft_backend.settings import DEBUG, SQL_DEVICES_URI, \
     SQL_ADMINS_URI
 from personal_mycroft_backend.database.devices import DeviceDatabase
 from personal_mycroft_backend.database.admin import AdminDatabase
