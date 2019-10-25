@@ -16,7 +16,7 @@ from flask_mail import Message
 from flask import request, Response
 
 from personal_mycroft_backend.backend.utils import geo_locate, \
-    generate_code, location_dict,  nice_json, gen_api
+    generate_code, location_dict, nice_json, gen_api
 from personal_mycroft_backend.settings import API_VERSION, DEBUG, SQL_DEVICES_URI
 from personal_mycroft_backend.backend.decorators import noindex, donation, requires_auth
 from personal_mycroft_backend.database import model_to_dict
@@ -209,22 +209,28 @@ def get_device_routes(app, mail_sender):
     @donation
     def activate():
         uuid = request.json["state"]
-
-        # paired?
+        from personal_mycroft_backend.settings import MAIL_USERNAME, MAIL_PASSWORD
+        # AUto pairing, hell yeah
         with DeviceDatabase(SQL_DEVICES_URI, debug=DEBUG) as device_db:
-            device = device_db.get_device_by_uuid(uuid)
-            if device is None or not device.paired:
+            device = device_db.get_unpaired_by_uuid(uuid)
+            if device is None:
                 return Response(
                     'Could not verify your access level for that URL.\n'
                     'You have to authenticate with proper credentials', 401,
                     {'WWW-Authenticate': 'Basic realm="NOT PAIRED"'})
-
-            # generate access tokens
-            device_db.add_device(uuid=uuid,
+            user = device_db.get_user_by_uuid(uuid)
+            # create user if it doesnt exist
+            if not user:
+                device_db.add_user(MAIL_USERNAME, MAIL_USERNAME.split("@")[0], MAIL_PASSWORD)
+            # auto pair!
+            device_db.add_device(uuid,
+                                 mail=MAIL_USERNAME,
                                  expires_at=time.time() + 72000,
                                  accessToken=gen_api(),
                                  refreshToken=gen_api())
-            result = model_to_dict(device)
+            device_db.remove_unpaired(uuid)
+            result = model_to_dict(device_db.get_device_by_uuid(uuid))
+            print(result)
         return nice_json(result)
 
     @app.route("/" + API_VERSION + "/device/<uuid>/message", methods=['PUT'])
