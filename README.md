@@ -1,17 +1,19 @@
-# Mycroft Backend
+# Personal Mycroft Backend
 
 
 Personal mycroft backend alternative to mycroft.home, written in flask
 
+Official mycroft backend has been open sourced, read the [blog post](https://mycroft.ai/blog/open-sourcing-the-mycroft-backend/)
+
+This repo is an alternative to the backend meant for personal usage, eventually this will become an out of the box solution to run completely offline
+
+If you need to manage multiple user accounts this project is not for you!
+
 # UNDER CONSTRUCTION
 
-![](personal_mycroft_backend/media/personalbackend.jpg)
-
-you can run it, but why would you before it's finished?
-
-Pull Requests welcome
-
 Mycroft Backend API docs can be found [here](https://mycroftai.github.io/mycroft-api-docs-renderer/)
+
+NOTE: this is the backend only, the plan is to make it compatible with the official [selene ui](https://github.com/MycroftAI/selene-ui)
 
 ## Install
 
@@ -62,13 +64,6 @@ start backend
     
     start_backend()
 
-start frontend
-
-    from personal_mycroft_backend.frontend import start_frontend
-    
-    start_frontend()
-
-
 more examples [here](examples)
 
 ## Features / Routes
@@ -91,14 +86,6 @@ more examples [here](examples)
 - multiple STT engines supported (google, wit, ibm, kaldi, bing, houndify, govivace, deepspeech)
 
 - sql database
-
-- user email confirmation
-
-- local browserless GUI if running on same machine
-
-- website (status: WIP)
-
-- store metrics (WIP - integrating into frontend, sql db and api endpoints functional)
 
 
 # TODOS
