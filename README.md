@@ -31,16 +31,13 @@ configure backend by editing/creating ~/.mycroft/personal_backend/personal_backe
 
     {
     "backend_port": 6712,
-    "website_port": 5000,
     "ssl": true,
     "ssl_key": "/home/user/.mycroft/personal_backend/certs/MycroftPersonalServer.key",
     "ssl_cert": "/home/user/.mycroft/personal_backend/certs/MycroftPersonalServer.crt",
     "mail_port": 465,
     "mail_server": "smtp.googlemail.com",
     "mail_user": "xxx@gmail.com",
-    "mail_password": "xxx",
-    "secret_key": "MY_PRECIOUS_SECRET_KEY",
-    "salt": "MY_TABLE_SALT"
+    "mail_password": "xxx"
     }
 
 change url in "server" section in your default mycroft config
@@ -48,8 +45,8 @@ change url in "server" section in your default mycroft config
      // Address of the REMOTE server
       // Override: none
       "server": {
-        "url": "https://0.0.0.0:6712",
-        "version": "v0.1",
+        "url": "http://0.0.0.0:6712",
+        "version": "v1",
         "update": true,
         "metrics": true
       },
