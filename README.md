@@ -51,7 +51,17 @@ change url in "server" section in your default mycroft config
         "metrics": true
       },
 
+if you want to perform TTS in the backend side change the mimic2 url
 
+    "tts": {
+        "module": "mimic2",
+        "mimic2": {
+          "lang": "en-us",
+          // this will allow you to use any number of tts on personal backend
+          // currently supported: google
+          "url": "http://0.0.0.0:6712/synthesize/google/female/en-us?text=",
+          "preloaded_cache": "/opt/mycroft/preloaded_cache/google"
+        },
 
 ## usage
 
@@ -84,6 +94,7 @@ more examples [here](examples)
 
 - sql database
 
+- remote TTS, mocking mimic2 api, currently only google tts support, more engines coming soon
 
 # TODOS
 
