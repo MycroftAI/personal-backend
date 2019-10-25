@@ -32,12 +32,10 @@ def create_app():
     from personal_mycroft_backend.backend.auth import get_auth_routes
     from personal_mycroft_backend.backend.device import get_device_routes
     from personal_mycroft_backend.backend.stt import get_stt_routes
-    from personal_mycroft_backend.backend.tts import get_tts_routes
 
     app = get_auth_routes(app)
     app = get_device_routes(app, mail)
     app = get_stt_routes(app)
-    app = get_tts_routes(app)
 
     @app.route("/", methods=['GET'])
     @noindex
