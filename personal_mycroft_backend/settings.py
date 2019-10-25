@@ -63,6 +63,31 @@ STT_CONFIG = conf.get("stt") or {"module": "google", "google": {}}
 
 LANG = conf.get("lang", "en-us")
 
+DEFAULT_LOCATION = {
+    "city": {
+        "code": "Lawrence",
+        "name": "Lawrence",
+        "state": {
+            "code": "KS",
+            "name": "Kansas",
+            "country": {
+                "code": "US",
+                "name": "United States"
+            }
+        }
+    },
+    "coordinate": {
+        "latitude": 38.971669,
+        "longitude": -95.23525
+    },
+    "timezone": {
+        "code": "America/Chicago",
+        "name": "Central Standard Time",
+        "dstOffset": 3600000,
+        "offset": -21600000
+    }
+}
+
 
 def create_conf_file():
     default_conf = {
@@ -75,7 +100,8 @@ def create_conf_file():
         "mail_user": MAIL_USERNAME,
         "mail_password": MAIL_PASSWORD,
         "mail_server": MAIL_SERVER,
-        "mail_port": MAIL_PORT
+        "mail_port": MAIL_PORT,
+        "default_location": DEFAULT_LOCATION
     }
     if exists(CONF_FILE):
         merge_dict(default_conf, load_commented_json(CONF_FILE))
