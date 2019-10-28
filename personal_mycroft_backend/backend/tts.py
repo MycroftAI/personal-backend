@@ -14,6 +14,7 @@
 #
 from pydub import AudioSegment
 import base64
+from requests import get
 from personal_mycroft_backend.backend.decorators import noindex, requires_auth
 from personal_mycroft_backend.tts import TTSFactory
 from personal_mycroft_backend.utils import nice_json
@@ -58,5 +59,12 @@ def get_tts_routes(app):
             path_to_file = convert(path_to_file)
         visimes = []  # TODO visime support?
         return build_response(path_to_file, visimes if return_visimes else None)
+
+    @app.route("/synthesize/mimic2/<voice>/<lang>", methods=['GET'])
+    @noindex
+    # @requires_auth
+    def mimic2_proxy(voice, lang):
+        # TODO cache results to save calls to mycroft.ai
+        return get("https://mimic-api.mycroft.ai/synthesize", params=request.args).content
 
     return app
