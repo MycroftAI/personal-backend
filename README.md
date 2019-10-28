@@ -58,8 +58,9 @@ if you want to perform TTS in the backend side change the mimic2 url
         "mimic2": {
           "lang": "en-us",
           // this will allow you to use any number of tts on personal backend
-          // currently supported: google
-          "url": "http://0.0.0.0:6712/synthesize/google/female/en-us?text=",
+          // currently supported: google, mimic2
+          // "url": "http://0.0.0.0:6712/synthesize/google/female/en-us?text=",
+          "url": "http://0.0.0.0:6712/synthesize/mimic2/kusal/en-us?text=",
           "preloaded_cache": "/opt/mycroft/preloaded_cache/google"
         },
 
@@ -94,32 +95,9 @@ more examples [here](examples)
 
 - sql database
 
-- remote TTS, mocking mimic2 api, currently only google tts support, more engines coming soon
-
-# TODOS
-
-- most of the frontend, are you a web dev? team up with me!
-
-- STT json settings in db (for google cloud stt engine)
-
-- skill settings
-
-- wakeword upload
-
-- wolfram alpha api
-
-- weather api
-
-- local data storage (audio recordings)
-
-- if opt in proxy data to mycroft (utterances/hotwords/metrics)
-
-- everything else i forgot
-
-- new functionality
-    - mimic 1 remote TTS 
-    - user voice print from uploaded utterances / wakewords
-    - train precise/snowboy models
+- remote TTS, mocking mimic2 api:
+    - google TTS
+    - Mimic2 Proxy
 
 # Credits
 
