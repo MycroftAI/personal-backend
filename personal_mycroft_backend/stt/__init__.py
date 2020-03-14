@@ -26,7 +26,7 @@ class STT(object):
     def __init__(self):
         self.lang = LANG
         self.module = STT_CONFIG.get("module")
-        self.config = STT_CONFIG.get(self.module)
+        self.config = STT_CONFIG.get(self.module) or {}
         self.credential = self.config.get("credential", {})
         self.recognizer = Recognizer()
 
