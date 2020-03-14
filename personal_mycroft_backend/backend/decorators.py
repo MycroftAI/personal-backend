@@ -44,15 +44,6 @@ def noindex(f):
     return add_response_headers({'X-Robots-Tag': 'noindex'})(f)
 
 
-def donation(f):
-    """This decorator passes donate request """
-    return add_response_headers({'BTC':
-                                     '1aeuaAijzwK4Jk2ixomRkqjF6Q3JxXp9Q',
-                                 "Patreon": "patreon.com/jarbasAI",
-                                 "Paypal": "paypal.me/jarbasAI"})(
-        f)
-
-
 def check_auth(api_key):
     """This function is called to check if a api key is valid."""
     with DeviceDatabase(SQL_DEVICES_URI, debug=DEBUG) as device_db:

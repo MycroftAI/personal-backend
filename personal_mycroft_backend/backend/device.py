@@ -18,7 +18,7 @@ from flask import request, Response
 from personal_mycroft_backend.utils import geo_locate, \
     generate_code, location_dict, nice_json, gen_api
 from personal_mycroft_backend.settings import API_VERSION, DEBUG, SQL_DEVICES_URI
-from personal_mycroft_backend.backend.decorators import noindex, donation, requires_auth
+from personal_mycroft_backend.backend.decorators import noindex, requires_auth
 from personal_mycroft_backend.database import model_to_dict
 from personal_mycroft_backend.database.devices import DeviceDatabase
 
@@ -28,7 +28,6 @@ import time
 def get_device_routes(app, mail_sender):
     @app.route("/" + API_VERSION + "/device/<uuid>/location", methods=['GET'])
     @noindex
-    @donation
     @requires_auth
     def location(uuid):
         with DeviceDatabase(SQL_DEVICES_URI, debug=DEBUG) as device_db:
@@ -55,7 +54,6 @@ def get_device_routes(app, mail_sender):
 
     @app.route("/" + API_VERSION + "/device/<uuid>/setting", methods=['GET'])
     @noindex
-    @donation
     @requires_auth
     def setting(uuid=""):
         with DeviceDatabase(SQL_DEVICES_URI, debug=DEBUG) as device_db:
@@ -159,7 +157,6 @@ def get_device_routes(app, mail_sender):
 
     @app.route("/" + API_VERSION + "/device/<uuid>", methods=['PATCH', 'GET'])
     @noindex
-    @donation
     @requires_auth
     def get_uuid(uuid):
         with DeviceDatabase(SQL_DEVICES_URI, debug=DEBUG) as device_db:
@@ -179,7 +176,6 @@ def get_device_routes(app, mail_sender):
 
     @app.route("/" + API_VERSION + "/device/code", methods=['GET'])
     @noindex
-    @donation
     def code():
         uuid = request.args["state"]
         code = generate_code()
@@ -192,7 +188,6 @@ def get_device_routes(app, mail_sender):
 
     @app.route("/" + API_VERSION + "/device/", methods=['GET'])
     @noindex
-    @donation
     @requires_auth
     def device():
         api = request.headers.get('Authorization', '').replace("Bearer ", "")
@@ -206,7 +201,6 @@ def get_device_routes(app, mail_sender):
 
     @app.route("/" + API_VERSION + "/device/activate", methods=['POST'])
     @noindex
-    @donation
     def activate():
         uuid = request.json["state"]
         from personal_mycroft_backend.settings import MAIL_USERNAME, MAIL_PASSWORD
@@ -235,7 +229,6 @@ def get_device_routes(app, mail_sender):
 
     @app.route("/" + API_VERSION + "/device/<uuid>/message", methods=['PUT'])
     @noindex
-    @donation
     @requires_auth
     def send_mail(uuid=""):
         data = request.json
@@ -253,7 +246,6 @@ def get_device_routes(app, mail_sender):
     @app.route("/" + API_VERSION + "/device/<uuid>/metric/<name>",
                methods=['POST'])
     @noindex
-    @donation
     @requires_auth
     def metric(uuid="", name=""):
         data = request.json
@@ -267,7 +259,6 @@ def get_device_routes(app, mail_sender):
     @app.route("/" + API_VERSION + "/device/<uuid>/subscription",
                methods=['GET'])
     @noindex
-    @donation
     @requires_auth
     def subscription_type(uuid=""):
         sub_type = "free"
@@ -280,7 +271,6 @@ def get_device_routes(app, mail_sender):
 
     @app.route("/" + API_VERSION + "/device/<uuid>/voice", methods=['GET'])
     @noindex
-    @donation
     @requires_auth
     def get_subscriber_voice_url(uuid=""):
         arch = request.args["arch"]
