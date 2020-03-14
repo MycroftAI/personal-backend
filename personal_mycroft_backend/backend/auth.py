@@ -15,7 +15,7 @@
 
 from personal_mycroft_backend.backend import API_VERSION, DEBUG, SQL_DEVICES_URI
 from personal_mycroft_backend.utils import nice_json, gen_api
-from personal_mycroft_backend.backend.decorators import noindex, donation, requires_admin
+from personal_mycroft_backend.backend.decorators import noindex, requires_admin
 from personal_mycroft_backend.database import model_to_dict
 from personal_mycroft_backend.database.devices import DeviceDatabase
 from flask import request, Response
@@ -26,7 +26,6 @@ def get_auth_routes(app):
     @app.route("/" + API_VERSION + "/pair/<code>/<uuid>/<name>/<mail>",
                methods=['PUT'])
     @noindex
-    @donation
     @requires_admin
     def pair(code, uuid, name, mail):
         # pair
@@ -45,7 +44,6 @@ def get_auth_routes(app):
 
     @app.route("/" + API_VERSION + "/auth/token", methods=['GET'])
     @noindex
-    @donation
     def token():
         api = request.headers.get('Authorization', '').replace("Bearer ", "")
         with DeviceDatabase(SQL_DEVICES_URI, debug=DEBUG) as device_db:

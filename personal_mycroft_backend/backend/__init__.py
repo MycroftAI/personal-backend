@@ -27,7 +27,7 @@ def create_app():
         sslify = SSLify(app)
 
     from personal_mycroft_backend.utils import nice_json
-    from personal_mycroft_backend.backend.decorators import noindex, donation
+    from personal_mycroft_backend.backend.decorators import noindex
 
     from personal_mycroft_backend.backend.auth import get_auth_routes
     from personal_mycroft_backend.backend.device import get_device_routes
@@ -41,7 +41,6 @@ def create_app():
 
     @app.route("/", methods=['GET'])
     @noindex
-    @donation
     def hello():
         return nice_json({
             "uri": "/",
