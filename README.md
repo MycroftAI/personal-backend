@@ -1,19 +1,24 @@
+![Status](https://img.shields.io/badge/-Experimental-orange.svg) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE.md) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+[![Join chat](https://img.shields.io/badge/Mattermost-join_chat-brightgreen.svg)](https://chat.mycroft.ai/community/channels/personal-backend)
+
 # Personal Mycroft Backend
 
 
-Personal mycroft backend alternative to mycroft.home, written in flask
-
-Official mycroft backend has been open sourced, read the [blog post](https://mycroft.ai/blog/open-sourcing-the-mycroft-backend/)
+Personal Mycroft backend alternative to home.mycroft.ai, written in flask.
 
 This repo is an alternative to the backend meant for personal usage, eventually this will become an out of the box solution to run completely offline
 
 If you need to manage multiple user accounts this project is not for you!
 
-# UNDER CONSTRUCTION
+## :construction: :construction: :construction: UNDER CONSTRUCTION
+
+This is a Mycroft Community project and is still under construction. It is experimental software. If you would like to contribute to running Mycroft as a personal self-hosted service please join the [~Personal-backend channel in Mycroft Chat](https://chat.mycroft.ai/community/channels/personal-backend).
+
+### Development Resources
 
 Mycroft Backend API docs can be found [here](https://mycroftai.github.io/mycroft-api-docs-renderer/)
 
-NOTE: this is the backend only, the plan is to make it compatible with the official [selene ui](https://github.com/MycroftAI/selene-ui)
+NOTE: this is the backend only, the plan is to make it compatible with the official [selene ui](https://github.com/MycroftAI/selene-ui). The official Mycroft backend has been open sourced, read the [blog post](https://mycroft.ai/blog/open-sourcing-the-mycroft-backend/).
 
 ## Install
 
