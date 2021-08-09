@@ -5,15 +5,17 @@ Personal mycroft backend alternative to mycroft.home, written in flask
 
 Official mycroft backend has been open sourced, read the [blog post](https://mycroft.ai/blog/open-sourcing-the-mycroft-backend/)
 
-This repo is an alternative to the backend meant for personal usage, eventually this will become an out of the box solution to run completely offline
+This repo is an alternative to the backend meant for personal usage, eventually this will become an out of the box solution to run completely offline. It is the backend only, the plan is to make it compatible with the official [selene ui](https://github.com/MycroftAI/selene-ui).
 
 If you need to manage multiple user accounts this project is not for you!
 
-# UNDER CONSTRUCTION
+## 🚧 UNDER CONSTRUCTION
+
+**WARNING: This project is incomplete and not actively maintained.**
 
 Mycroft Backend API docs can be found [here](https://mycroftai.github.io/mycroft-api-docs-renderer/)
 
-NOTE: this is the backend only, the plan is to make it compatible with the official [selene ui](https://github.com/MycroftAI/selene-ui)
+The original author of this project is continuing work at https://github.com/OpenVoiceOS/OVOS-local-backend
 
 ## Install
 
