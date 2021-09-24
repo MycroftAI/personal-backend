@@ -42,7 +42,7 @@ SQL_DEVICES_URI = conf.get("devices_db",
 SSL = conf.get("ssl", False)
 SSL_CERT = conf.get("ssl_cert")
 SSL_KEY = conf.get("ssl_key")
-if not SSL_CERT or not SSL_KEY:
+if not exists(SSL_CERT) or not exists(SSL_KEY):
     SSL_CERT, SSL_KEY = create_self_signed_cert(join(DATA_PATH, "certs"),
                                                 "MycroftPersonalServer")
 
