@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import json
+
 from flask_mail import Message
 from flask import request, Response
 
@@ -169,7 +171,7 @@ def get_device_routes(app, mail_sender):
                                          accessToken=result.get("accessToken"),
                                          refreshToken=result.get("refreshToken"))
 
-                result = model_to_dict(device)
+                result = device.as_dict
             else:
                 result = {}
         return nice_json(result)
@@ -280,4 +282,29 @@ def get_device_routes(app, mail_sender):
                 device.arch = arch
         return nice_json({"link": ""})
 
+    @app.route("/" + API_VERSION + "/device/<uuid>/skill", methods=['GET', 'PUT'])
+    @noindex
+    @donation
+    @requires_auth
+    def skill(uuid=""):
+        with DeviceDatabase(SQL_DEVICES_URI, debug=DEBUG) as device_db:
+            device = device_db.get_device_by_uuid(uuid)
+            if device is not None:
+                if request.method == 'GET':
+                    skills = []
+                    for skill in device.skills_info:
+                        skills.append(skill.as_dict)
+
+                    return nice_json(skills)
+                if request.method == 'PUT':
+                    data = request.json
+                    skill_metadata = u''
+                    # Replace parsed json structure with text representation
+                    if 'skillMetadata' in data.keys():
+                        skill_metadata = str(json.dumps(data['skillMetadata']))
+
+                    data['skillMetadata'] = skill_metadata
+                    device_db.add_skill_info(uuid, data)
+
+        return nice_json({"link": ""})
     return app
